@@ -841,10 +841,10 @@ console.log(hello("[[world]]"));</textarea>
                 metalness: 0.05,
             }),
             topbar = new THREE.Mesh(
-                new THREE.ShapeGeometry(titlebarShape(7.06, 0.48, 0.2), 48),
+                new THREE.ShapeGeometry(titlebarShape(7.06, 0.42, 0.2), 48),
                 barMaterial,
             );
-        topbar.position.set(0, 1.92, 0.161);
+        topbar.position.set(0, 1.95, 0.161);
         topbar.receiveShadow = true;
         group.add(topbar);
         const codeCanvas = document.createElement("canvas"),
@@ -866,7 +866,7 @@ console.log(hello("[[world]]"));</textarea>
             ["#00ca4e", -2.52],
         ].forEach(([color, x]) => {
             const dot = new THREE.Mesh(
-                new THREE.CylinderGeometry(0.085, 0.085, 0.04, 48, 1, false),
+                new THREE.CylinderGeometry(0.075, 0.075, 0.04, 64, 1, false),
                 new THREE.MeshStandardMaterial({
                     color,
                     roughness: 0.56,
@@ -875,7 +875,7 @@ console.log(hello("[[world]]"));</textarea>
                 }),
             );
             dot.rotation.x = Math.PI / 2;
-            dot.position.set(x, 1.92, 0.183);
+            dot.position.set(x, 1.95, 0.183);
             dot.castShadow = true;
             group.add(dot);
         });
@@ -1078,7 +1078,7 @@ console.log(hello("[[world]]"));</textarea>
             codeTexture.needsUpdate = true;
             const t = titleTexture.image.getContext("2d");
             t.clearRect(0, 0, 600, 80);
-            t.font = `32px ${editorFont}`;
+            t.font = `35px ${editorFont}`;
             t.textAlign = "center";
             t.textBaseline = "middle";
             t.fillStyle = "#fff";
