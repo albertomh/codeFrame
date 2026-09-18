@@ -439,7 +439,7 @@ console.log(hello("[[world]]"));</textarea>
             ["#00ca4e", -2.52],
         ].forEach(([color, x]) => {
             const dot = new THREE.Mesh(
-                new THREE.CylinderGeometry(0.11, 0.11, 0.045, 48, 1, false),
+                new THREE.CylinderGeometry(0.085, 0.085, 0.04, 48, 1, false),
                 new THREE.MeshStandardMaterial({
                     color,
                     roughness: 0.56,
@@ -554,10 +554,10 @@ console.log(hello("[[world]]"));</textarea>
             codeTexture.needsUpdate = true;
             const t = titleTexture.image.getContext("2d");
             t.clearRect(0, 0, 600, 80);
-            t.font = `26px ${editorFont}`;
+            t.font = `32px ${editorFont}`;
             t.textAlign = "center";
             t.textBaseline = "middle";
-            t.fillStyle = "#bac6d9";
+            t.fillStyle = "#fff";
             t.fillText(title, 300, 40);
             titleTexture.needsUpdate = true;
         }
