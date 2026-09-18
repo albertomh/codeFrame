@@ -862,8 +862,8 @@ console.log(hello("[[world]]"));</textarea>
         group.add(codeMesh);
         [
             ["#ff6259", -3.12],
-            ["#ffbd44", -2.82],
-            ["#00ca4e", -2.52],
+            ["#ffbd44", -2.88],
+            ["#00ca4e", -2.64],
         ].forEach(([color, x]) => {
             const dot = new THREE.Mesh(
                 new THREE.CylinderGeometry(0.075, 0.075, 0.04, 64, 1, false),
@@ -877,6 +877,7 @@ console.log(hello("[[world]]"));</textarea>
             dot.rotation.x = Math.PI / 2;
             dot.position.set(x, 1.95, 0.183);
             dot.castShadow = true;
+            dot.renderOrder = 3;
             group.add(dot);
         });
         const titleTexture = new THREE.CanvasTexture(document.createElement("canvas"));
