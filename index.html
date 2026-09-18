@@ -179,6 +179,10 @@
             stroke-linecap: round;
             stroke-linejoin: round;
         }
+        .reset-height .restore-icon {
+            fill: currentColor;
+            stroke: none;
+        }
         input,
         textarea,
         select {
@@ -544,8 +548,18 @@
                                     aria-label="Restore default 3D text height"
                                     title="Restore default height"
                                 >
-                                    <svg viewBox="0 0 24 24">
-                                        <path d="M4 9V4h5M4.5 4.5a8 8 0 1 1-1 9.5" />
+                                    <svg
+                                        class="restore-icon"
+                                        viewBox="0 0 16 16"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            fill-rule="evenodd"
+                                            d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2z"
+                                        />
+                                        <path
+                                            d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466"
+                                        />
                                     </svg>
                                 </button></span
                             >
