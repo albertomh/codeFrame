@@ -119,6 +119,27 @@
             width: 100%;
             height: 100%;
         }
+        #zoom-indicator {
+            position: absolute;
+            z-index: 2;
+            left: 14px;
+            bottom: 14px;
+            display: none;
+            width: 52px;
+            padding: 6px 8px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 7px;
+            color: #fff;
+            background: rgba(8, 13, 23, 0.72);
+            box-shadow: 0 5px 16px rgba(0, 0, 0, 0.25);
+            font-size: 11px;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            text-align: right;
+        }
+        #zoom-indicator.active {
+            display: block;
+        }
         aside {
             align-self: start;
             padding: 18px;
@@ -377,6 +398,7 @@
             <section class="workspace">
                 <div class="preview">
                     <img id="snapshot" alt="Rendered 3D code snippet card">
+                    <div id="zoom-indicator" aria-live="polite">0%</div>
                     <div
                         id="nav-gizmo"
                         role="application"
@@ -602,7 +624,8 @@ console.log(hello("[[world]]"));</textarea>
 
         const preview = document.querySelector(".preview"),
             image = document.querySelector("#snapshot"),
-            gizmo = document.querySelector("#nav-gizmo");
+            gizmo = document.querySelector("#nav-gizmo"),
+            zoomIndicator = document.querySelector("#zoom-indicator");
         const themes = {
             midnight: {
                 bg: "#101624",
@@ -773,6 +796,13 @@ console.log(hello("[[world]]"));</textarea>
             gizmoCamera.lookAt(0, 0, 0);
             gizmoRenderer.render(gizmoScene, gizmoCamera);
         }
+        function updateZoomIndicator() {
+            const distance = camera.position.distanceTo(controls.target),
+                percent = Math.round(
+                    ((zoomLimits.max - distance) / (zoomLimits.max - zoomLimits.min)) * 100,
+                );
+            zoomIndicator.textContent = `${THREE.MathUtils.clamp(percent, 0, 100)}%`;
+        }
         const controls = new OrbitControls(camera, gizmoRenderer.domElement);
         controls.enableDamping = false;
         controls.enablePan = false;
@@ -784,6 +814,7 @@ console.log(hello("[[world]]"));</textarea>
             if (activeCamera === "free") {
                 renderer.render(scene, camera);
                 renderGizmo();
+                updateZoomIndicator();
             }
         });
         renderer.domElement.addEventListener(
@@ -1179,12 +1210,15 @@ console.log(hello("[[world]]"));</textarea>
                 controls.enabled = true;
                 controls.update();
                 gizmo.classList.add("active");
+                zoomIndicator.classList.add("active");
                 renderer.domElement.classList.add("active");
                 renderGizmo();
+                updateZoomIndicator();
                 return;
             }
             controls.enabled = false;
             gizmo.classList.remove("active");
+            zoomIndicator.classList.remove("active");
             renderer.domElement.classList.remove("active");
             const [x, y, z] = cameraPresets[activeCamera];
             camera.position.set(x, y, z);
