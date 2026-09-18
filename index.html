@@ -337,6 +337,19 @@ console.log(hello("[[world]]"));</textarea>
             s.quadraticCurveTo(x, y, x + r, y);
             return s;
         }
+        function titlebarShape(w, h, r) {
+            const x = -w / 2,
+                y = -h / 2,
+                s = new THREE.Shape();
+            s.moveTo(x, y);
+            s.lineTo(x + w, y);
+            s.lineTo(x + w, y + h - r);
+            s.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+            s.lineTo(x + r, y + h);
+            s.quadraticCurveTo(x, y + h, x, y + h - r);
+            s.lineTo(x, y);
+            return s;
+        }
         const bodyMaterial = new THREE.MeshStandardMaterial({
                 color: themes.midnight.body,
                 metalness: 0.38,
@@ -364,7 +377,10 @@ console.log(hello("[[world]]"));</textarea>
         screen.position.z = 0.15;
         group.add(screen);
         const barMaterial = new THREE.MeshBasicMaterial({ color: themes.midnight.bar }),
-            topbar = new THREE.Mesh(new THREE.PlaneGeometry(7.0, 0.64), barMaterial);
+            topbar = new THREE.Mesh(
+                new THREE.ShapeGeometry(titlebarShape(7.06, 0.64, 0.2)),
+                barMaterial,
+            );
         topbar.position.set(0, 1.84, 0.161);
         group.add(topbar);
         const codeCanvas = document.createElement("canvas"),
