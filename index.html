@@ -271,6 +271,24 @@
         .language-button[data-language="HTML"] {
             --language-icon: url("https://cdn.jsdelivr.net/npm/simple-icons@15.15.0/icons/html5.svg");
         }
+        .camera-button.free-view .axis-x {
+            stroke: #7181ff;
+        }
+        .camera-button.free-view .axis-y {
+            stroke: #91e800;
+        }
+        .camera-button.free-view .axis-z {
+            stroke: #ff5262;
+        }
+        .camera-button.free-view circle.axis-x {
+            fill: #7181ff;
+        }
+        .camera-button.free-view circle.axis-y {
+            fill: #91e800;
+        }
+        .camera-button.free-view circle.axis-z {
+            fill: #ff5262;
+        }
         button {
             width: 100%;
             cursor: pointer;
@@ -456,7 +474,7 @@
                                 </svg>
                             </button>
                             <button
-                                class="camera-button"
+                                class="camera-button free-view"
                                 type="button"
                                 data-camera="free"
                                 aria-label="Free view: drag preview to rotate"
@@ -464,10 +482,12 @@
                                 title="Free view"
                             >
                                 <svg viewBox="0 0 24 24">
-                                    <circle cx="12" cy="12" r="4.5" />
-                                    <path
-                                        d="M4 10a8.5 8.5 0 0 1 12.7-5.8M16.7 4.2v3.4h-3.4M20 14a8.5 8.5 0 0 1-12.7 5.8M7.3 19.8v-3.4h3.4"
-                                    />
+                                    <path class="axis-x" d="m12 13 7 4" />
+                                    <circle class="axis-x" cx="19" cy="17" r="2.1" />
+                                    <path class="axis-y" d="M12 13V5" />
+                                    <circle class="axis-y" cx="12" cy="5" r="2.1" />
+                                    <path class="axis-z" d="m12 13-7 4" />
+                                    <circle class="axis-z" cx="5" cy="17" r="2.1" />
                                 </svg>
                             </button>
                         </div>
