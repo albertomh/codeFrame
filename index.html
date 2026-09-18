@@ -7,7 +7,7 @@
             content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
         >
         <meta name="description" content="A tiny 3D code snippet showcase.">
-        <title>Snippet / Studio</title>
+        <title>codeShowcase</title>
         <style>
         :root {
             color-scheme: dark;
@@ -50,19 +50,6 @@
             font-weight: 750;
             letter-spacing: -0.03em;
         }
-        .brand i {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-right: 8px;
-            background: #81f0bc;
-            box-shadow: 0 0 14px #81f0bc;
-        }
-        .tag {
-            color: var(--muted);
-            font-size: 12px;
-        }
         .workspace {
             display: grid;
             grid-template-columns: minmax(0, 1fr) 300px;
@@ -84,16 +71,6 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-        }
-        .corner {
-            position: absolute;
-            left: 22px;
-            bottom: 18px;
-            color: #aab4c7;
-            font-size: 11px;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            opacity: 0.68;
         }
         aside {
             align-self: start;
@@ -186,9 +163,6 @@
             .preview {
                 min-height: 440px;
             }
-            header .tag {
-                display: none;
-            }
             aside {
                 order: -1;
             }
@@ -197,15 +171,9 @@
     </head>
     <body>
         <main>
-            <header>
-                <div class="brand"><i></i>snippet / studio</div>
-                <div class="tag">3D code card · PNG snapshot generator</div>
-            </header>
+            <header><div class="brand">codeShowcase</div></header>
             <section class="workspace">
-                <div class="preview">
-                    <img id="snapshot" alt="Rendered 3D code snippet card">
-                    <div class="corner">rendered in real time · PNG-ready</div>
-                </div>
+                <div class="preview"><img id="snapshot" alt="Rendered 3D code snippet card"></div>
                 <aside>
                     <div class="field">
                         <label for="title">Window title</label>
@@ -222,8 +190,15 @@
                             </select>
                         </div>
                         <div>
-                            <label for="accent">Accent</label>
-                            <input id="accent" type="color" value="#8bf0be">
+                            <label for="theme">Theme</label
+                            ><select id="theme">
+                                <option value="midnight">Midnight</option>
+                                <option value="monokai">Monokai</option>
+                                <option value="darcula">Darcula</option>
+                                <option value="solarized">Solarized Dark</option>
+                                <option value="dracula">Dracula</option>
+                                <option value="nord">Nord</option>
+                            </select>
                         </div>
                     </div>
                     <div class="field">
@@ -232,23 +207,88 @@
   return `Hello, ${name}.`;
 };
 
-console.log(hello("world"));</textarea>
+console.log(hello("[[world]]"));</textarea>
                     </div>
                     <button id="render">Render snapshot</button
                     ><button id="download">Download PNG</button>
                     <p class="hint">
-                        The image is rendered from a lit Three.js scene, not a CSS mockup.
+                        Wrap text in <code>[[double brackets]]</code> to raise it above the code
+                        surface.
                     </p>
                 </aside>
             </section>
         </main>
         <script type="module">
         import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js";
+        import { FontLoader } from "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/loaders/FontLoader.js";
+        import { TextGeometry } from "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/geometries/TextGeometry.js";
 
         const preview = document.querySelector(".preview"),
             image = document.querySelector("#snapshot");
+        const themes = {
+            midnight: {
+                bg: "#101624",
+                body: "#172033",
+                screen: "#0a0f1b",
+                bar: "#121a2a",
+                text: "#d8e1f1",
+                muted: "#4d5a72",
+                keyword: "#8bf0be",
+                type: "#dba5ff",
+            },
+            monokai: {
+                bg: "#272822",
+                body: "#3d3d34",
+                screen: "#272822",
+                bar: "#1f201c",
+                text: "#f8f8f2",
+                muted: "#75715e",
+                keyword: "#f92672",
+                type: "#66d9ef",
+            },
+            darcula: {
+                bg: "#252526",
+                body: "#3c3f41",
+                screen: "#2b2b2b",
+                bar: "#323232",
+                text: "#a9b7c6",
+                muted: "#5c6370",
+                keyword: "#cc7832",
+                type: "#a9b7c6",
+            },
+            solarized: {
+                bg: "#002b36",
+                body: "#073642",
+                screen: "#002b36",
+                bar: "#073642",
+                text: "#93a1a1",
+                muted: "#586e75",
+                keyword: "#b58900",
+                type: "#2aa198",
+            },
+            dracula: {
+                bg: "#282a36",
+                body: "#44475a",
+                screen: "#282a36",
+                bar: "#343746",
+                text: "#f8f8f2",
+                muted: "#6272a4",
+                keyword: "#ff79c6",
+                type: "#8be9fd",
+            },
+            nord: {
+                bg: "#2e3440",
+                body: "#434c5e",
+                screen: "#2e3440",
+                bar: "#3b4252",
+                text: "#eceff4",
+                muted: "#4c566a",
+                keyword: "#88c0d0",
+                type: "#b48ead",
+            },
+        };
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color("#101624");
+        scene.background = new THREE.Color(themes.midnight.bg);
         const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
         camera.position.set(0, 1.2, 10.2);
         const renderer = new THREE.WebGLRenderer({
@@ -297,30 +337,34 @@ console.log(hello("world"));</textarea>
             s.quadraticCurveTo(x, y, x + r, y);
             return s;
         }
-        const body = new THREE.Mesh(
-            new THREE.ExtrudeGeometry(roundedShape(7.3, 4.6, 0.28), {
-                depth: 0.18,
-                bevelEnabled: true,
-                bevelSegments: 3,
-                bevelSize: 0.07,
-                bevelThickness: 0.08,
+        const bodyMaterial = new THREE.MeshStandardMaterial({
+                color: themes.midnight.body,
+                metalness: 0.38,
+                roughness: 0.34,
             }),
-            new THREE.MeshStandardMaterial({ color: "#172033", metalness: 0.38, roughness: 0.34 }),
-        );
+            body = new THREE.Mesh(
+                new THREE.ExtrudeGeometry(roundedShape(7.3, 4.6, 0.28), {
+                    depth: 0.18,
+                    bevelEnabled: true,
+                    bevelSegments: 3,
+                    bevelSize: 0.07,
+                    bevelThickness: 0.08,
+                }),
+                bodyMaterial,
+            );
         body.position.z = -0.12;
         body.castShadow = true;
         body.receiveShadow = true;
         group.add(body);
-        const screen = new THREE.Mesh(
-            new THREE.ShapeGeometry(roundedShape(7.06, 4.36, 0.2)),
-            new THREE.MeshBasicMaterial({ color: "#0a0f1b" }),
-        );
+        const screenMaterial = new THREE.MeshBasicMaterial({ color: themes.midnight.screen }),
+            screen = new THREE.Mesh(
+                new THREE.ShapeGeometry(roundedShape(7.06, 4.36, 0.2)),
+                screenMaterial,
+            );
         screen.position.z = 0.15;
         group.add(screen);
-        const topbar = new THREE.Mesh(
-            new THREE.PlaneGeometry(7.0, 0.64),
-            new THREE.MeshBasicMaterial({ color: "#121a2a" }),
-        );
+        const barMaterial = new THREE.MeshBasicMaterial({ color: themes.midnight.bar }),
+            topbar = new THREE.Mesh(new THREE.PlaneGeometry(7.0, 0.64), barMaterial);
         topbar.position.set(0, 1.84, 0.161);
         group.add(topbar);
         const codeCanvas = document.createElement("canvas"),
@@ -335,20 +379,24 @@ console.log(hello("world"));</textarea>
         );
         codeMesh.position.set(0.05, -0.28, 0.17);
         group.add(codeMesh);
-        const dots = [];
         [
             ["#ff6259", -3.12],
             ["#ffbd44", -2.82],
             ["#00ca4e", -2.52],
         ].forEach(([color, x]) => {
             const dot = new THREE.Mesh(
-                new THREE.SphereGeometry(0.105, 20, 20),
-                new THREE.MeshStandardMaterial({ color, roughness: 0.3, metalness: 0.15 }),
+                new THREE.CylinderGeometry(0.11, 0.11, 0.045, 12, 1, false),
+                new THREE.MeshStandardMaterial({
+                    color,
+                    roughness: 0.56,
+                    metalness: 0.05,
+                    flatShading: true,
+                }),
             );
+            dot.rotation.x = Math.PI / 2;
             dot.position.set(x, 1.84, 0.3);
             dot.castShadow = true;
             group.add(dot);
-            dots.push(dot);
         });
         const titleTexture = new THREE.CanvasTexture(document.createElement("canvas"));
         titleTexture.image.width = 600;
@@ -359,22 +407,44 @@ console.log(hello("world"));</textarea>
         );
         titleMesh.position.set(0.25, 1.84, 0.18);
         group.add(titleMesh);
+        const popGroup = new THREE.Group();
+        group.add(popGroup);
+        let font;
+        new FontLoader().load(
+            "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/fonts/helvetiker_regular.typeface.json",
+            (loaded) => {
+                font = loaded;
+                update();
+            },
+        );
+        function disposePops() {
+            while (popGroup.children.length) {
+                const mesh = popGroup.children.pop();
+                mesh.geometry.dispose();
+                mesh.material.dispose();
+            }
+        }
         function draw() {
             const code = document.querySelector("#code").value,
                 title = document.querySelector("#title").value || "untitled",
-                accent = document.querySelector("#accent").value,
-                language = document.querySelector("#language").value;
+                language = document.querySelector("#language").value,
+                theme = themes[document.querySelector("#theme").value];
+            scene.background.set(theme.bg);
+            bodyMaterial.color.set(theme.body);
+            screenMaterial.color.set(theme.screen);
+            barMaterial.color.set(theme.bar);
             ctx.clearRect(0, 0, 1400, 800);
-            ctx.fillStyle = "#0a0f1b";
+            ctx.fillStyle = theme.screen;
             ctx.fillRect(0, 0, 1400, 800);
             ctx.font = "31px ui-monospace, Menlo, monospace";
             ctx.textBaseline = "middle";
+            disposePops();
             const lines = code.split("\n");
-            lines.forEach((line, i) => {
+            lines.forEach((rawLine, i) => {
+                const line = rawLine.replace(/\[\[(.*?)\]\]/g, "$1");
                 let y = 76 + i * 57;
-                ctx.fillStyle = "#4d5a72";
+                ctx.fillStyle = theme.muted;
                 ctx.fillText(String(i + 1).padStart(2, " "), 45, y);
-                ctx.fillStyle = "#d8e1f1";
                 const chunks = line.split(
                     /(const|let|return|console|log|function|def|class|import|from|if|else|string|true|false)/g,
                 );
@@ -384,20 +454,53 @@ console.log(hello("world"));</textarea>
                         /^(const|let|return|console|log|function|def|class|import|from|if|else)$/.test(
                             chunk,
                         )
-                            ? accent
+                            ? theme.keyword
                             : /^(string|true|false)$/.test(chunk)
-                              ? "#dba5ff"
-                              : "#d8e1f1";
+                              ? theme.type
+                              : theme.text;
                     ctx.fillText(chunk, x, y);
                     x += ctx.measureText(chunk).width;
                 });
+                if (font)
+                    [...rawLine.matchAll(/\[\[(.*?)\]\]/g)].forEach((match) => {
+                        const before = rawLine
+                                .slice(0, match.index)
+                                .replace(/\[\[(.*?)\]\]/g, "$1"),
+                            px = 142 + ctx.measureText(before).width,
+                            geometry = new TextGeometry(match[1], {
+                                font,
+                                size: 31,
+                                height: 13,
+                                curveSegments: 3,
+                                bevelEnabled: true,
+                                bevelThickness: 2,
+                                bevelSize: 0.7,
+                                bevelSegments: 2,
+                            }),
+                            mesh = new THREE.Mesh(
+                                geometry,
+                                new THREE.MeshStandardMaterial({
+                                    color: theme.keyword,
+                                    roughness: 0.28,
+                                    metalness: 0.12,
+                                }),
+                            );
+                        mesh.scale.setScalar(0.006);
+                        mesh.position.set(
+                            0.05 - 3.36 + (px / 1400) * 6.72,
+                            -0.28 + 1.71 - (y / 800) * 3.42,
+                            0.27,
+                        );
+                        mesh.castShadow = true;
+                        popGroup.add(mesh);
+                    });
             });
-            ctx.fillStyle = accent;
+            ctx.fillStyle = theme.keyword;
             ctx.globalAlpha = 0.85;
             ctx.fillRect(42, 665, 9, 34);
             ctx.globalAlpha = 1;
             ctx.font = "23px ui-sans-serif, sans-serif";
-            ctx.fillStyle = "#7f8da5";
+            ctx.fillStyle = theme.muted;
             ctx.fillText(language.toUpperCase(), 75, 684);
             codeTexture.needsUpdate = true;
             const t = titleTexture.image.getContext("2d");
@@ -422,12 +525,20 @@ console.log(hello("world"));</textarea>
             draw();
             snapshot();
         }
+        let updateTimer;
+        const scheduleUpdate = () => {
+            clearTimeout(updateTimer);
+            updateTimer = setTimeout(update, 180);
+        };
+        document
+            .querySelectorAll("input, textarea, select")
+            .forEach((field) => field.addEventListener("input", scheduleUpdate));
         document.querySelector("#render").addEventListener("click", update);
         document.querySelector("#download").addEventListener("click", () => {
             snapshot();
             const a = document.createElement("a");
             a.href = renderer.domElement.toDataURL("image/png");
-            a.download = "snippet-studio.png";
+            a.download = "code-showcase.png";
             a.click();
         });
         new ResizeObserver(snapshot).observe(preview);
