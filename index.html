@@ -232,7 +232,7 @@
         button:hover {
             background: #b2f7d1;
         }
-        button + button {
+        #download {
             margin-top: 9px;
             color: #dbe6fa;
             background: #202a3d;
@@ -347,26 +347,26 @@
                             <button
                                 class="camera-button active"
                                 type="button"
-                                data-camera="studio"
-                                aria-label="Studio angle"
-                                aria-pressed="true"
-                                title="Studio angle"
-                            >
-                                <svg viewBox="0 0 24 24">
-                                    <path d="m3 8 9-4 9 4-9 4zM3 8v8l9 4 9-4V8M12 12v8" />
-                                </svg>
-                            </button>
-                            <button
-                                class="camera-button"
-                                type="button"
                                 data-camera="front"
                                 aria-label="Front view"
-                                aria-pressed="false"
+                                aria-pressed="true"
                                 title="Front view"
                             >
                                 <svg viewBox="0 0 24 24">
                                     <rect x="4" y="5" width="16" height="12" rx="2" />
                                     <path d="M8 20h8M12 17v3" />
+                                </svg>
+                            </button>
+                            <button
+                                class="camera-button"
+                                type="button"
+                                data-camera="studio"
+                                aria-label="Studio angle"
+                                aria-pressed="false"
+                                title="Studio angle"
+                            >
+                                <svg viewBox="0 0 24 24">
+                                    <path d="m3 8 9-4 9 4-9 4zM3 8v8l9 4 9-4V8M12 12v8" />
                                 </svg>
                             </button>
                             <button
@@ -814,7 +814,7 @@ console.log(hello("[[world]]"));</textarea>
             right: [6, 2.8, 9.4],
             high: [2.4, 6.8, 8.8],
         };
-        let activeCamera = "studio";
+        let activeCamera = "front";
         function applyCamera() {
             const [x, y, z] = cameraPresets[activeCamera];
             camera.position.set(x, y, z);
