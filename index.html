@@ -96,6 +96,14 @@
             letter-spacing: 0.09em;
             text-transform: uppercase;
         }
+        .range-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .range-label output {
+            font-variant-numeric: tabular-nums;
+        }
         input,
         textarea,
         select {
@@ -329,9 +337,11 @@
                             <option value="midnight">Midnight</option>
                             <option value="monokai">Monokai</option>
                             <option value="darcula">Darcula</option>
-                            <option value="solarized">Solarized Dark</option>
+                            <option value="solarized">Solarized</option>
                             <option value="dracula">Dracula</option>
                             <option value="nord">Nord</option>
+                            <option value="contrastLight">High Contrast Light</option>
+                            <option value="contrastDark">High Contrast Dark</option>
                         </select>
                     </div>
                     <div class="field">
@@ -413,8 +423,9 @@
                         </div>
                     </div>
                     <div class="field">
-                        <label for="pop-height"
-                            >3D text height <output id="pop-height-value">0.011</output></label
+                        <label class="range-label" for="pop-height"
+                            ><span>3D text height</span
+                            ><output id="pop-height-value">0.011</output></label
                         ><input
                             id="pop-height"
                             type="range"
@@ -485,12 +496,12 @@ console.log(hello("[[world]]"));</textarea>
                 type: "#a9b7c6",
             },
             solarized: {
-                bg: "#002b36",
-                body: "#073642",
-                screen: "#002b36",
-                bar: "#073642",
-                text: "#93a1a1",
-                muted: "#586e75",
+                bg: "#fdf6e3",
+                body: "#eee8d5",
+                screen: "#fdf6e3",
+                bar: "#586e75",
+                text: "#586e75",
+                muted: "#93a1a1",
                 keyword: "#b58900",
                 type: "#2aa198",
             },
@@ -513,6 +524,26 @@ console.log(hello("[[world]]"));</textarea>
                 muted: "#4c566a",
                 keyword: "#88c0d0",
                 type: "#b48ead",
+            },
+            contrastLight: {
+                bg: "#ffffff",
+                body: "#e5e5e5",
+                screen: "#ffffff",
+                bar: "#202020",
+                text: "#000000",
+                muted: "#555555",
+                keyword: "#a00000",
+                type: "#005f9e",
+            },
+            contrastDark: {
+                bg: "#000000",
+                body: "#252525",
+                screen: "#000000",
+                bar: "#171717",
+                text: "#ffffff",
+                muted: "#ababab",
+                keyword: "#00ff66",
+                type: "#00d9ff",
             },
         };
         const scene = new THREE.Scene();
@@ -656,12 +687,16 @@ console.log(hello("[[world]]"));</textarea>
         const popGroup = new THREE.Group();
         group.add(popGroup);
         function disposePops() {
+            const textures = new Set(),
+                geometries = new Set();
             while (popGroup.children.length) {
                 const mesh = popGroup.children.pop();
-                mesh.geometry.dispose();
-                mesh.material.map.dispose();
+                geometries.add(mesh.geometry);
+                textures.add(mesh.material.map);
                 mesh.material.dispose();
             }
+            geometries.forEach((geometry) => geometry.dispose());
+            textures.forEach((texture) => texture.dispose());
         }
         const syntaxTokens = {
             TypeScript: {
@@ -761,17 +796,39 @@ console.log(hello("[[world]]"));</textarea>
             const texture = new THREE.CanvasTexture(tile);
             texture.colorSpace = THREE.SRGBColorSpace;
             texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-            const mesh = new THREE.Mesh(
-                new THREE.PlaneGeometry((tile.width / 1400) * 6.72, (tile.height / 800) * 3.42),
-                new THREE.MeshBasicMaterial({ map: texture, transparent: true, depthWrite: false }),
+            const geometry = new THREE.PlaneGeometry(
+                    (tile.width / 1400) * 6.72,
+                    (tile.height / 800) * 3.42,
+                ),
+                x = 0.05 - 3.36 + ((px + tile.width / 2) / 1400) * 6.72,
+                z = 0.171,
+                layers = Math.min(24, Math.max(1, Math.ceil(height / 0.008))),
+                sideColor = new THREE.Color(color).multiplyScalar(0.42);
+            for (let layer = 0; layer < layers; layer++) {
+                const side = new THREE.Mesh(
+                    geometry,
+                    new THREE.MeshBasicMaterial({
+                        map: texture,
+                        color: sideColor,
+                        transparent: true,
+                        alphaTest: 0.01,
+                    }),
+                );
+                side.position.set(
+                    x,
+                    -0.28 + 1.71 - (y / 800) * 3.42,
+                    z + (height * layer) / layers,
+                );
+                side.renderOrder = 1;
+                popGroup.add(side);
+            }
+            const face = new THREE.Mesh(
+                geometry.clone(),
+                new THREE.MeshBasicMaterial({ map: texture, transparent: true, alphaTest: 0.01 }),
             );
-            mesh.position.set(
-                0.05 - 3.36 + ((px + tile.width / 2) / 1400) * 6.72,
-                -0.28 + 1.71 - (y / 800) * 3.42,
-                0.17 + height,
-            );
-            mesh.renderOrder = 1;
-            popGroup.add(mesh);
+            face.position.set(x, -0.28 + 1.71 - (y / 800) * 3.42, z + height);
+            face.renderOrder = 2;
+            popGroup.add(face);
         }
         function draw() {
             const code = document.querySelector("#code").value,
