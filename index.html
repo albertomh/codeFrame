@@ -207,8 +207,8 @@
                     <div class="field">
                         <label for="code">Snippet</label>
                         <p class="hint code-hint">
-                            Wrap text in <code>[[double brackets]]</code> to raise it above the code
-                            surface.
+                            Wrap text in <code>[[double brackets]]</code> to render it as a flush 3D
+                            layer.
                         </p>
                         <textarea id="code" spellcheck="false">const hello = (name: string) => {
   return `Hello, ${name}.`;
@@ -230,8 +230,6 @@ console.log(hello("[[world]]"));</textarea>
         </script>
         <script type="module">
         import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js";
-        import { FontLoader } from "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/loaders/FontLoader.js";
-        import { TextGeometry } from "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/geometries/TextGeometry.js";
 
         const preview = document.querySelector(".preview"),
             image = document.querySelector("#snapshot");
@@ -435,20 +433,46 @@ console.log(hello("[[world]]"));</textarea>
         group.add(titleMesh);
         const popGroup = new THREE.Group();
         group.add(popGroup);
-        let font;
-        new FontLoader().load(
-            "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/fonts/helvetiker_regular.typeface.json",
-            (loaded) => {
-                font = loaded;
-                update();
-            },
-        );
         function disposePops() {
             while (popGroup.children.length) {
                 const mesh = popGroup.children.pop();
                 mesh.geometry.dispose();
+                mesh.material.map.dispose();
                 mesh.material.dispose();
             }
+        }
+        function codeColor(token, theme) {
+            return /^(const|let|return|console|log|function|def|class|import|from|if|else)$/.test(
+                token,
+            )
+                ? theme.keyword
+                : /^(string|true|false)$/.test(token)
+                  ? theme.type
+                  : theme.text;
+        }
+        function addFlushText(text, px, y, color) {
+            const width = Math.ceil(ctx.measureText(text).width) + 2,
+                tile = document.createElement("canvas"),
+                tileCtx = tile.getContext("2d");
+            tile.width = width;
+            tile.height = 57;
+            tileCtx.font = ctx.font;
+            tileCtx.textBaseline = "middle";
+            tileCtx.fillStyle = color;
+            tileCtx.fillText(text, 0, 28.5);
+            const texture = new THREE.CanvasTexture(tile);
+            texture.colorSpace = THREE.SRGBColorSpace;
+            const mesh = new THREE.Mesh(
+                new THREE.PlaneGeometry((tile.width / 1400) * 6.72, (tile.height / 800) * 3.42),
+                new THREE.MeshBasicMaterial({ map: texture, transparent: true, depthWrite: false }),
+            );
+            mesh.position.set(
+                0.05 - 3.36 + ((px + tile.width / 2) / 1400) * 6.72,
+                -0.28 + 1.71 - (y / 800) * 3.42,
+                0.181,
+            );
+            mesh.renderOrder = 1;
+            popGroup.add(mesh);
         }
         function draw() {
             const code = document.querySelector("#code").value,
@@ -476,50 +500,15 @@ console.log(hello("[[world]]"));</textarea>
                 );
                 let x = 142;
                 chunks.forEach((chunk) => {
-                    ctx.fillStyle =
-                        /^(const|let|return|console|log|function|def|class|import|from|if|else)$/.test(
-                            chunk,
-                        )
-                            ? theme.keyword
-                            : /^(string|true|false)$/.test(chunk)
-                              ? theme.type
-                              : theme.text;
+                    ctx.fillStyle = codeColor(chunk, theme);
                     ctx.fillText(chunk, x, y);
                     x += ctx.measureText(chunk).width;
                 });
-                if (font)
-                    [...rawLine.matchAll(/\[\[(.*?)\]\]/g)].forEach((match) => {
-                        const before = rawLine
-                                .slice(0, match.index)
-                                .replace(/\[\[(.*?)\]\]/g, "$1"),
-                            px = 142 + ctx.measureText(before).width,
-                            geometry = new TextGeometry(match[1], {
-                                font,
-                                size: 31,
-                                height: 13,
-                                curveSegments: 3,
-                                bevelEnabled: true,
-                                bevelThickness: 2,
-                                bevelSize: 0.7,
-                                bevelSegments: 2,
-                            }),
-                            mesh = new THREE.Mesh(
-                                geometry,
-                                new THREE.MeshStandardMaterial({
-                                    color: theme.keyword,
-                                    roughness: 0.28,
-                                    metalness: 0.12,
-                                }),
-                            );
-                        mesh.scale.setScalar(0.006);
-                        mesh.position.set(
-                            0.05 - 3.36 + (px / 1400) * 6.72,
-                            -0.28 + 1.71 - (y / 800) * 3.42,
-                            0.27,
-                        );
-                        mesh.castShadow = true;
-                        popGroup.add(mesh);
-                    });
+                [...rawLine.matchAll(/\[\[(.*?)\]\]/g)].forEach((match) => {
+                    const before = rawLine.slice(0, match.index).replace(/\[\[(.*?)\]\]/g, "$1"),
+                        px = 142 + ctx.measureText(before).width;
+                    addFlushText(match[1], px, y, codeColor(match[1], theme));
+                });
             });
             ctx.fillStyle = theme.keyword;
             ctx.globalAlpha = 0.85;
