@@ -1,0 +1,15 @@
+# Dependencies and tool caches
+node_modules/
+.biome/
+.pre-commit-cache/
+
+# Local environment and editor state
+.env
+.env.*
+.vscode/
+.idea/
+*.DS_Store
+
+# Generated output
+dist/
+coverage/
