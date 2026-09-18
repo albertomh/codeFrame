@@ -141,9 +141,43 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin: 0 0 7px;
+        }
+        .range-label label {
+            margin: 0;
         }
         .range-label output {
             font-variant-numeric: tabular-nums;
+        }
+        .range-value {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .reset-height {
+            display: grid;
+            place-items: center;
+            width: 18px;
+            height: 18px;
+            padding: 0;
+            border: 0;
+            border-radius: 5px;
+            color: #dce8fb;
+            background: transparent;
+            box-shadow: none;
+        }
+        .reset-height:hover {
+            color: #fff;
+            background: #243149;
+        }
+        .reset-height svg {
+            width: 14px;
+            height: 14px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
         input,
         textarea,
@@ -422,6 +456,12 @@
                         </select>
                     </div>
                     <div class="field">
+                        <label class="range-label" for="font-size"
+                            ><span>IDE font size</span
+                            ><output id="font-size-value">31 px</output></label
+                        ><input id="font-size" type="range" min="20" max="42" step="1" value="31">
+                    </div>
+                    <div class="field">
                         <label>Camera</label>
                         <div class="camera-options" role="group" aria-label="Camera angle">
                             <button
@@ -493,16 +533,30 @@
                         </div>
                     </div>
                     <div class="field">
-                        <label class="range-label" for="pop-height"
-                            ><span>3D text height</span
-                            ><output id="pop-height-value">0.011</output></label
-                        ><input
+                        <div class="range-label">
+                            <label for="pop-height">3D text height</label
+                            ><span class="range-value"
+                                ><output id="pop-height-value">0.040</output
+                                ><button
+                                    id="reset-pop-height"
+                                    class="reset-height"
+                                    type="button"
+                                    aria-label="Restore default 3D text height"
+                                    title="Restore default height"
+                                >
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M4 9V4h5M4.5 4.5a8 8 0 1 1-1 9.5" />
+                                    </svg>
+                                </button></span
+                            >
+                        </div>
+                        <input
                             id="pop-height"
                             type="range"
                             min="0"
                             max="0.3"
                             step="0.001"
-                            value="0.011"
+                            value="0.040"
                         >
                     </div>
                     <div class="field">
@@ -760,14 +814,6 @@ console.log(hello("[[world]]"));</textarea>
         const rim = new THREE.PointLight("#718bff", 22, 16, 2);
         rim.position.set(5, 2, 2);
         scene.add(rim);
-        const floor = new THREE.Mesh(
-            new THREE.PlaneGeometry(40, 40),
-            new THREE.ShadowMaterial({ color: "#000000", opacity: 0.38 }),
-        );
-        floor.rotation.x = -Math.PI / 2;
-        floor.position.y = -3.2;
-        floor.receiveShadow = true;
-        scene.add(floor);
         function roundedShape(w, h, r) {
             const x = -w / 2,
                 y = -h / 2,
@@ -1041,6 +1087,7 @@ console.log(hello("[[world]]"));</textarea>
                 language = document.querySelector("#language").value,
                 theme = themes[document.querySelector("#theme").value],
                 fontName = document.querySelector("#font").value,
+                fontSize = Number(document.querySelector("#font-size").value),
                 popHeight = Number(document.querySelector("#pop-height").value),
                 editorFont = `"${fontName}", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace`;
             document.documentElement.style.setProperty("--editor-font", `"${fontName}"`);
@@ -1051,16 +1098,17 @@ console.log(hello("[[world]]"));</textarea>
             ctx.clearRect(0, 0, 1400, 800);
             ctx.fillStyle = theme.screen;
             ctx.fillRect(0, 0, 1400, 800);
-            ctx.font = `31px ${editorFont}`;
+            ctx.font = `${fontSize}px ${editorFont}`;
             ctx.textBaseline = "middle";
             disposePops();
             const syntaxPattern = new RegExp(
-                `(${[...syntaxTokens[language].keywords, ...syntaxTokens[language].types].join("|")})`,
-            );
+                    `(${[...syntaxTokens[language].keywords, ...syntaxTokens[language].types].join("|")})`,
+                ),
+                lineHeight = fontSize * (57 / 31);
             const lines = code.split("\n");
             lines.forEach((rawLine, i) => {
                 const line = rawLine.replace(/\[\[(.*?)\]\]/g, "$1");
-                let y = 76 + i * 57;
+                let y = 76 + i * lineHeight;
                 ctx.fillStyle = theme.muted;
                 ctx.fillText(String(i + 1).padStart(2, " "), 45, y);
                 const chunks = line.split(syntaxPattern);
@@ -1079,7 +1127,7 @@ console.log(hello("[[world]]"));</textarea>
             codeTexture.needsUpdate = true;
             const t = titleTexture.image.getContext("2d");
             t.clearRect(0, 0, 600, 80);
-            t.font = `35px ${editorFont}`;
+            t.font = `${Math.round(fontSize * 1.13)}px ${editorFont}`;
             t.textAlign = "center";
             t.textBaseline = "middle";
             t.fillStyle = "#fff";
@@ -1140,6 +1188,19 @@ console.log(hello("[[world]]"));</textarea>
                     (document.querySelector("#pop-height-value").value = Number(
                         event.target.value,
                     ).toFixed(3)),
+            );
+        document.querySelector("#reset-pop-height").addEventListener("click", () => {
+            const height = document.querySelector("#pop-height");
+            height.value = ".040";
+            document.querySelector("#pop-height-value").value = "0.040";
+            scheduleUpdate();
+        });
+        document
+            .querySelector("#font-size")
+            .addEventListener(
+                "input",
+                (event) =>
+                    (document.querySelector("#font-size-value").value = `${event.target.value} px`),
             );
         document
             .querySelector("#font")
