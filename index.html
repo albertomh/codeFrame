@@ -84,7 +84,7 @@
         label {
             display: block;
             margin: 0 0 7px;
-            color: #bac5d7;
+            color: #fff;
             font-size: 11px;
             font-weight: 700;
             letter-spacing: 0.09em;
@@ -152,6 +152,9 @@
             color: var(--muted);
             font-size: 11px;
         }
+        .code-hint {
+            margin: -1px 0 8px;
+        }
         @media (max-width: 800px) {
             main {
                 width: min(100% - 24px, 620px);
@@ -202,8 +205,12 @@
                         </div>
                     </div>
                     <div class="field">
-                        <label for="code">Snippet</label
-                        ><textarea id="code" spellcheck="false">const hello = (name: string) => {
+                        <label for="code">Snippet</label>
+                        <p class="hint code-hint">
+                            Wrap text in <code>[[double brackets]]</code> to raise it above the code
+                            surface.
+                        </p>
+                        <textarea id="code" spellcheck="false">const hello = (name: string) => {
   return `Hello, ${name}.`;
 };
 
@@ -211,13 +218,16 @@ console.log(hello("[[world]]"));</textarea>
                     </div>
                     <button id="render">Render snapshot</button
                     ><button id="download">Download PNG</button>
-                    <p class="hint">
-                        Wrap text in <code>[[double brackets]]</code> to raise it above the code
-                        surface.
-                    </p>
                 </aside>
             </section>
         </main>
+        <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js"
+            }
+        }
+        </script>
         <script type="module">
         import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js";
         import { FontLoader } from "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/loaders/FontLoader.js";
