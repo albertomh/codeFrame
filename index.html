@@ -8,6 +8,12 @@
         >
         <meta name="description" content="A tiny 3D code snippet showcase.">
         <title>codeShowcase</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=IBM+Plex+Mono:wght@400;500&family=JetBrains+Mono:wght@400;500&family=Reddit+Mono:wght@400;500&family=Roboto+Mono:wght@400;500&family=Source+Code+Pro:wght@400;500&display=swap"
+            rel="stylesheet"
+        >
         <style>
         :root {
             color-scheme: dark;
@@ -112,7 +118,8 @@
             min-height: 230px;
             resize: vertical;
             font:
-                12px / 1.55 ui-monospace,
+                12px / 1.55 var(--editor-font, "Fira Code"),
+                ui-monospace,
                 SFMono-Regular,
                 Menlo,
                 Monaco,
@@ -203,6 +210,17 @@
                                 <option value="nord">Nord</option>
                             </select>
                         </div>
+                    </div>
+                    <div class="field">
+                        <label for="font">IDE font</label
+                        ><select id="font">
+                            <option>Fira Code</option>
+                            <option>Reddit Mono</option>
+                            <option>JetBrains Mono</option>
+                            <option>IBM Plex Mono</option>
+                            <option>Source Code Pro</option>
+                            <option>Roboto Mono</option>
+                        </select>
                     </div>
                     <div class="field">
                         <label for="code">Snippet</label>
@@ -478,7 +496,10 @@ console.log(hello("[[world]]"));</textarea>
             const code = document.querySelector("#code").value,
                 title = document.querySelector("#title").value || "untitled",
                 language = document.querySelector("#language").value,
-                theme = themes[document.querySelector("#theme").value];
+                theme = themes[document.querySelector("#theme").value],
+                fontName = document.querySelector("#font").value,
+                editorFont = `"${fontName}", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace`;
+            document.documentElement.style.setProperty("--editor-font", `"${fontName}"`);
             scene.background.set(theme.bg);
             bodyMaterial.color.set(theme.body);
             screenMaterial.color.set(theme.screen);
@@ -486,7 +507,7 @@ console.log(hello("[[world]]"));</textarea>
             ctx.clearRect(0, 0, 1400, 800);
             ctx.fillStyle = theme.screen;
             ctx.fillRect(0, 0, 1400, 800);
-            ctx.font = "31px ui-monospace, Menlo, monospace";
+            ctx.font = `31px ${editorFont}`;
             ctx.textBaseline = "middle";
             disposePops();
             const lines = code.split("\n");
@@ -520,7 +541,7 @@ console.log(hello("[[world]]"));</textarea>
             codeTexture.needsUpdate = true;
             const t = titleTexture.image.getContext("2d");
             t.clearRect(0, 0, 600, 80);
-            t.font = "32px ui-sans-serif, system-ui";
+            t.font = `26px ${editorFont}`;
             t.textAlign = "center";
             t.textBaseline = "middle";
             t.fillStyle = "#bac6d9";
@@ -548,6 +569,11 @@ console.log(hello("[[world]]"));</textarea>
         document
             .querySelectorAll("input, textarea, select")
             .forEach((field) => field.addEventListener("input", scheduleUpdate));
+        document
+            .querySelector("#font")
+            .addEventListener("change", () =>
+                document.fonts.load(`31px "${document.querySelector("#font").value}"`).then(update),
+            );
         document.querySelector("#render").addEventListener("click", update);
         document.querySelector("#download").addEventListener("click", () => {
             snapshot();
@@ -557,6 +583,7 @@ console.log(hello("[[world]]"));</textarea>
             a.click();
         });
         new ResizeObserver(snapshot).observe(preview);
+        document.fonts.ready.then(update);
         update();
         </script>
     </body>
