@@ -169,6 +169,55 @@
             stroke-linecap: round;
             stroke-linejoin: round;
         }
+        .language-options {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 7px;
+        }
+        .language-button {
+            display: grid;
+            place-items: center;
+            aspect-ratio: 1.25;
+            padding: 0;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 9px;
+            color: #aebbd0;
+            background: #0d1422;
+            box-shadow: none;
+        }
+        .language-button:hover {
+            color: #fff;
+            background: #172238;
+        }
+        .language-button.active {
+            color: #091019;
+            background: #8bf0be;
+            border-color: #8bf0be;
+            box-shadow: 0 5px 13px rgba(88, 229, 162, 0.16);
+        }
+        .language-button::before {
+            width: 20px;
+            height: 20px;
+            content: "";
+            background: currentColor;
+            -webkit-mask: var(--language-icon) center / contain no-repeat;
+            mask: var(--language-icon) center / contain no-repeat;
+        }
+        .language-button[data-language="TypeScript"] {
+            --language-icon: url("https://cdn.jsdelivr.net/npm/simple-icons@15.15.0/icons/typescript.svg");
+        }
+        .language-button[data-language="JavaScript"] {
+            --language-icon: url("https://cdn.jsdelivr.net/npm/simple-icons@15.15.0/icons/javascript.svg");
+        }
+        .language-button[data-language="Python"] {
+            --language-icon: url("https://cdn.jsdelivr.net/npm/simple-icons@15.15.0/icons/python.svg");
+        }
+        .language-button[data-language="CSS"] {
+            --language-icon: url("https://cdn.jsdelivr.net/npm/simple-icons@15.15.0/icons/css.svg");
+        }
+        .language-button[data-language="HTML"] {
+            --language-icon: url("https://cdn.jsdelivr.net/npm/simple-icons@15.15.0/icons/html5.svg");
+        }
         button {
             width: 100%;
             cursor: pointer;
@@ -224,27 +273,62 @@
                         <label for="title">Window title</label>
                         <input id="title" value="hello.ts" maxlength="28">
                     </div>
-                    <div class="field split">
-                        <div>
-                            <label for="language">Language</label
-                            ><select id="language">
-                                <option>TypeScript</option>
-                                <option>JavaScript</option>
-                                <option>Python</option>
-                                <option>CSS</option>
-                            </select>
+                    <div class="field">
+                        <label>Language</label>
+                        <input id="language" type="hidden" value="TypeScript">
+                        <div
+                            class="language-options"
+                            role="group"
+                            aria-label="Syntax highlighting language"
+                        >
+                            <button
+                                class="language-button active"
+                                type="button"
+                                data-language="TypeScript"
+                                aria-label="TypeScript"
+                                aria-pressed="true"
+                                title="TypeScript"
+                            ></button><button
+                                class="language-button"
+                                type="button"
+                                data-language="JavaScript"
+                                aria-label="JavaScript"
+                                aria-pressed="false"
+                                title="JavaScript"
+                            ></button><button
+                                class="language-button"
+                                type="button"
+                                data-language="Python"
+                                aria-label="Python"
+                                aria-pressed="false"
+                                title="Python"
+                            ></button><button
+                                class="language-button"
+                                type="button"
+                                data-language="CSS"
+                                aria-label="CSS"
+                                aria-pressed="false"
+                                title="CSS"
+                            ></button><button
+                                class="language-button"
+                                type="button"
+                                data-language="HTML"
+                                aria-label="HTML"
+                                aria-pressed="false"
+                                title="HTML"
+                            ></button>
                         </div>
-                        <div>
-                            <label for="theme">Theme</label
-                            ><select id="theme">
-                                <option value="midnight">Midnight</option>
-                                <option value="monokai">Monokai</option>
-                                <option value="darcula">Darcula</option>
-                                <option value="solarized">Solarized Dark</option>
-                                <option value="dracula">Dracula</option>
-                                <option value="nord">Nord</option>
-                            </select>
-                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="theme">Theme</label
+                        ><select id="theme">
+                            <option value="midnight">Midnight</option>
+                            <option value="monokai">Monokai</option>
+                            <option value="darcula">Darcula</option>
+                            <option value="solarized">Solarized Dark</option>
+                            <option value="dracula">Dracula</option>
+                            <option value="nord">Nord</option>
+                        </select>
                     </div>
                     <div class="field">
                         <label for="font">IDE font</label
@@ -563,12 +647,88 @@ console.log(hello("[[world]]"));</textarea>
                 mesh.material.dispose();
             }
         }
-        function codeColor(token, theme) {
-            return /^(const|let|return|console|log|function|def|class|import|from|if|else)$/.test(
-                token,
-            )
+        const syntaxTokens = {
+            TypeScript: {
+                keywords: [
+                    "const",
+                    "let",
+                    "return",
+                    "console",
+                    "log",
+                    "function",
+                    "class",
+                    "import",
+                    "from",
+                    "if",
+                    "else",
+                ],
+                types: ["string", "number", "boolean", "true", "false"],
+            },
+            JavaScript: {
+                keywords: [
+                    "const",
+                    "let",
+                    "return",
+                    "console",
+                    "log",
+                    "function",
+                    "class",
+                    "import",
+                    "from",
+                    "if",
+                    "else",
+                ],
+                types: ["true", "false", "null", "undefined"],
+            },
+            Python: {
+                keywords: [
+                    "def",
+                    "return",
+                    "class",
+                    "import",
+                    "from",
+                    "if",
+                    "else",
+                    "for",
+                    "in",
+                    "print",
+                ],
+                types: ["str", "int", "bool", "True", "False", "None"],
+            },
+            CSS: {
+                keywords: [
+                    "color",
+                    "background",
+                    "display",
+                    "position",
+                    "margin",
+                    "padding",
+                    "font",
+                    "grid",
+                    "flex",
+                ],
+                types: ["px", "rem", "vh", "vw"],
+            },
+            HTML: {
+                keywords: [
+                    "html",
+                    "head",
+                    "body",
+                    "div",
+                    "span",
+                    "script",
+                    "style",
+                    "main",
+                    "section",
+                ],
+                types: ["class", "id", "href", "src", "alt"],
+            },
+        };
+        function codeColor(token, theme, language) {
+            const tokens = syntaxTokens[language];
+            return tokens.keywords.includes(token)
                 ? theme.keyword
-                : /^(string|true|false)$/.test(token)
+                : tokens.types.includes(token)
                   ? theme.type
                   : theme.text;
         }
@@ -615,34 +775,28 @@ console.log(hello("[[world]]"));</textarea>
             ctx.font = `31px ${editorFont}`;
             ctx.textBaseline = "middle";
             disposePops();
+            const syntaxPattern = new RegExp(
+                `(${[...syntaxTokens[language].keywords, ...syntaxTokens[language].types].join("|")})`,
+            );
             const lines = code.split("\n");
             lines.forEach((rawLine, i) => {
                 const line = rawLine.replace(/\[\[(.*?)\]\]/g, "$1");
                 let y = 76 + i * 57;
                 ctx.fillStyle = theme.muted;
                 ctx.fillText(String(i + 1).padStart(2, " "), 45, y);
-                const chunks = line.split(
-                    /(const|let|return|console|log|function|def|class|import|from|if|else|string|true|false)/g,
-                );
+                const chunks = line.split(syntaxPattern);
                 let x = 142;
                 chunks.forEach((chunk) => {
-                    ctx.fillStyle = codeColor(chunk, theme);
+                    ctx.fillStyle = codeColor(chunk, theme, language);
                     ctx.fillText(chunk, x, y);
                     x += ctx.measureText(chunk).width;
                 });
                 [...rawLine.matchAll(/\[\[(.*?)\]\]/g)].forEach((match) => {
                     const before = rawLine.slice(0, match.index).replace(/\[\[(.*?)\]\]/g, "$1"),
                         px = 142 + ctx.measureText(before).width;
-                    addFlushText(match[1], px, y, codeColor(match[1], theme));
+                    addFlushText(match[1], px, y, codeColor(match[1], theme, language));
                 });
             });
-            ctx.fillStyle = theme.keyword;
-            ctx.globalAlpha = 0.85;
-            ctx.fillRect(42, 665, 9, 34);
-            ctx.globalAlpha = 1;
-            ctx.font = "23px ui-sans-serif, sans-serif";
-            ctx.fillStyle = theme.muted;
-            ctx.fillText(language.toUpperCase(), 75, 684);
             codeTexture.needsUpdate = true;
             const t = titleTexture.image.getContext("2d");
             t.clearRect(0, 0, 600, 80);
@@ -715,6 +869,17 @@ console.log(hello("[[world]]"));</textarea>
         new ResizeObserver(snapshot).observe(preview);
         document.fonts.ready.then(update);
         update();
+        document.querySelectorAll(".language-button").forEach((button) =>
+            button.addEventListener("click", () => {
+                document.querySelector("#language").value = button.dataset.language;
+                document.querySelectorAll(".language-button").forEach((item) => {
+                    const isActive = item === button;
+                    item.classList.toggle("active", isActive);
+                    item.setAttribute("aria-pressed", isActive);
+                });
+                scheduleUpdate();
+            }),
+        );
         </script>
     </body>
 </html>
