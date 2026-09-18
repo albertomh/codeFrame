@@ -1091,6 +1091,8 @@ console.log(hello("[[world]]"));</textarea>
         const codeTexture = new THREE.CanvasTexture(codeCanvas);
         codeTexture.colorSpace = THREE.SRGBColorSpace;
         codeTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+        codeTexture.repeat.set(1 / contentWidth, 1 / contentHeight);
+        codeTexture.offset.set(0.5, 0.5);
         const codeMesh = new THREE.Mesh(
             new THREE.ShapeGeometry(contentShape(contentWidth, contentHeight, 0.2), 48),
             new THREE.MeshBasicMaterial({ map: codeTexture, transparent: true }),
