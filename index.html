@@ -1018,6 +1018,19 @@ console.log(hello("[[world]]"));</textarea>
             s.lineTo(x, y);
             return s;
         }
+        function contentShape(w, h, r) {
+            const x = -w / 2,
+                y = -h / 2,
+                s = new THREE.Shape();
+            s.moveTo(x, y + r);
+            s.lineTo(x, y + h);
+            s.lineTo(x + w, y + h);
+            s.lineTo(x + w, y + r);
+            s.quadraticCurveTo(x + w, y, x + w - r, y);
+            s.lineTo(x + r, y);
+            s.quadraticCurveTo(x, y, x, y + r);
+            return s;
+        }
         function frameShape() {
             const frame = roundedShape(7.3, 4.6, 0.28),
                 hole = new THREE.Path(roundedShape(7.06, 4.36, 0.2).getPoints(48).reverse());
@@ -1068,18 +1081,21 @@ console.log(hello("[[world]]"));</textarea>
         topbar.position.set(0, 1.95, 0.161);
         topbar.receiveShadow = true;
         group.add(topbar);
-        const codeCanvas = document.createElement("canvas"),
+        const contentWidth = 7.06,
+            contentHeight = 3.92,
+            contentTop = 1.74,
+            codeCanvas = document.createElement("canvas"),
             ctx = codeCanvas.getContext("2d");
         codeCanvas.width = 1400;
-        codeCanvas.height = 800;
+        codeCanvas.height = 778;
         const codeTexture = new THREE.CanvasTexture(codeCanvas);
         codeTexture.colorSpace = THREE.SRGBColorSpace;
         codeTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
         const codeMesh = new THREE.Mesh(
-            new THREE.PlaneGeometry(6.72, 3.42),
+            new THREE.ShapeGeometry(contentShape(contentWidth, contentHeight, 0.2), 48),
             new THREE.MeshBasicMaterial({ map: codeTexture, transparent: true }),
         );
-        codeMesh.position.set(0.05, -0.28, 0.17);
+        codeMesh.position.set(0, -0.22, 0.17);
         group.add(codeMesh);
         [
             ["#ff6259", -3.12],
@@ -1223,13 +1239,14 @@ console.log(hello("[[world]]"));</textarea>
             texture.colorSpace = THREE.SRGBColorSpace;
             texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
             const geometry = new THREE.PlaneGeometry(
-                    (tile.width / 1400) * 6.72,
-                    (tile.height / 800) * 3.42,
+                    (tile.width / codeCanvas.width) * contentWidth,
+                    (tile.height / codeCanvas.height) * contentHeight,
                 ),
-                x = 0.05 - 3.36 + ((px + tile.width / 2) / 1400) * 6.72,
+                x = -contentWidth / 2 + ((px + tile.width / 2) / codeCanvas.width) * contentWidth,
                 z = 0.171,
                 layers = Math.min(24, Math.max(1, Math.ceil(height / 0.008))),
-                sideColor = new THREE.Color(color).multiplyScalar(0.42);
+                sideColor = new THREE.Color(color).multiplyScalar(0.42),
+                textY = contentTop - (y / codeCanvas.height) * contentHeight;
             for (let layer = 0; layer < layers; layer++) {
                 const side = new THREE.Mesh(
                     geometry,
@@ -1240,11 +1257,7 @@ console.log(hello("[[world]]"));</textarea>
                         alphaTest: 0.01,
                     }),
                 );
-                side.position.set(
-                    x,
-                    -0.28 + 1.71 - (y / 800) * 3.42,
-                    z + (height * layer) / layers,
-                );
+                side.position.set(x, textY, z + (height * layer) / layers);
                 side.renderOrder = 1;
                 popGroup.add(side);
             }
@@ -1252,7 +1265,7 @@ console.log(hello("[[world]]"));</textarea>
                 geometry.clone(),
                 new THREE.MeshBasicMaterial({ map: texture, transparent: true, alphaTest: 0.01 }),
             );
-            face.position.set(x, -0.28 + 1.71 - (y / 800) * 3.42, z + height);
+            face.position.set(x, textY, z + height);
             face.renderOrder = 2;
             popGroup.add(face);
         }
@@ -1270,9 +1283,9 @@ console.log(hello("[[world]]"));</textarea>
             bodyMaterial.color.set(theme.body);
             screenMaterial.color.set(theme.screen);
             barMaterial.color.set(theme.bar);
-            ctx.clearRect(0, 0, 1400, 800);
+            ctx.clearRect(0, 0, codeCanvas.width, codeCanvas.height);
             ctx.fillStyle = theme.screen;
-            ctx.fillRect(0, 0, 1400, 800);
+            ctx.fillRect(0, 0, codeCanvas.width, codeCanvas.height);
             ctx.font = `${fontSize}px ${editorFont}`;
             ctx.textBaseline = "middle";
             disposePops();
