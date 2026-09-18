@@ -27,7 +27,8 @@
         }
         body {
             margin: 0;
-            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
             font:
                 14px / 1.45 Inter,
                 ui-sans-serif,
@@ -41,8 +42,9 @@
         }
         main {
             width: min(1180px, calc(100% - 40px));
+            height: 100vh;
             margin: auto;
-            padding: 32px 0 42px;
+            padding: 24px 0;
         }
         header {
             display: flex;
@@ -59,10 +61,11 @@
         .workspace {
             display: grid;
             grid-template-columns: minmax(0, 1fr) 300px;
+            height: 100%;
             gap: 22px;
         }
         .preview {
-            min-height: 580px;
+            min-height: 0;
             position: relative;
             overflow: hidden;
             border: 1px solid var(--line);
@@ -230,8 +233,8 @@
             box-shadow: 0 0 0 3px rgba(92, 116, 227, 0.15);
         }
         textarea {
-            min-height: 230px;
-            resize: vertical;
+            min-height: clamp(150px, 27vh, 230px);
+            resize: none;
             font:
                 12px / 1.55 var(--editor-font, "Fira Code"),
                 ui-monospace,
@@ -249,12 +252,14 @@
             grid-template-columns: 1fr 1fr;
             gap: 10px;
         }
-        .camera-options {
+        .camera-options,
+        .lighting-options {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 7px;
         }
-        .camera-button {
+        .camera-button,
+        .lighting-button {
             display: grid;
             place-items: center;
             aspect-ratio: 1.25;
@@ -265,101 +270,20 @@
             background: #0d1422;
             box-shadow: none;
         }
-        .camera-button:hover {
+        .camera-button:hover,
+        .lighting-button:hover {
             color: #fff;
             background: #172238;
         }
-        .camera-button.active {
+        .camera-button.active,
+        .lighting-button.active {
             color: #091019;
             background: #8bf0be;
             border-color: #8bf0be;
             box-shadow: 0 5px 13px rgba(88, 229, 162, 0.16);
         }
-        .camera-button svg {
-            width: 20px;
-            height: 20px;
-            stroke: currentColor;
-            fill: none;
-            stroke-width: 1.7;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-        .language-options {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 7px;
-        }
-        .language-button {
-            display: grid;
-            place-items: center;
-            aspect-ratio: 1.25;
-            padding: 0;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 9px;
-            color: #aebbd0;
-            background: #0d1422;
-            box-shadow: none;
-        }
-        .language-button:hover {
-            color: #fff;
-            background: #172238;
-        }
-        .language-button.active {
-            color: #091019;
-            background: #8bf0be;
-            border-color: #8bf0be;
-            box-shadow: 0 5px 13px rgba(88, 229, 162, 0.16);
-        }
-        .language-button::before {
-            width: 20px;
-            height: 20px;
-            content: "";
-            background: currentColor;
-            -webkit-mask: var(--language-icon) center / contain no-repeat;
-            mask: var(--language-icon) center / contain no-repeat;
-        }
-        .language-button[data-language="TypeScript"] {
-            --language-icon: url("https://cdn.jsdelivr.net/npm/simple-icons@15.15.0/icons/typescript.svg");
-        }
-        .language-button[data-language="JavaScript"] {
-            --language-icon: url("https://cdn.jsdelivr.net/npm/simple-icons@15.15.0/icons/javascript.svg");
-        }
-        .language-button[data-language="Python"] {
-            --language-icon: url("https://cdn.jsdelivr.net/npm/simple-icons@15.15.0/icons/python.svg");
-        }
-        .language-button[data-language="CSS"] {
-            --language-icon: url("https://cdn.jsdelivr.net/npm/simple-icons@15.15.0/icons/css.svg");
-        }
-        .language-button[data-language="HTML"] {
-            --language-icon: url("https://cdn.jsdelivr.net/npm/simple-icons@15.15.0/icons/html5.svg");
-        }
-        .camera-options {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 7px;
-        }
-        .camera-button {
-            display: grid;
-            place-items: center;
-            aspect-ratio: 1.25;
-            padding: 0;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 9px;
-            color: #aebbd0;
-            background: #0d1422;
-            box-shadow: none;
-        }
-        .camera-button:hover {
-            color: #fff;
-            background: #172238;
-        }
-        .camera-button.active {
-            color: #091019;
-            background: #8bf0be;
-            border-color: #8bf0be;
-            box-shadow: 0 5px 13px rgba(88, 229, 162, 0.16);
-        }
-        .camera-button svg {
+        .camera-button svg,
+        .lighting-button svg {
             width: 20px;
             height: 20px;
             stroke: currentColor;
@@ -413,26 +337,10 @@
         .code-hint {
             margin: -1px 0 8px;
         }
-        @media (max-width: 800px) {
-            main {
-                width: min(100% - 24px, 620px);
-                padding-top: 16px;
-            }
-            .workspace {
-                grid-template-columns: 1fr;
-            }
-            .preview {
-                min-height: 440px;
-            }
-            aside {
-                order: -1;
-            }
-        }
         </style>
     </head>
     <body>
         <main>
-            <header><div class="brand">codeShowcase</div></header>
             <section class="workspace">
                 <div class="preview">
                     <img id="snapshot" alt="Rendered 3D code snippet card">
@@ -449,64 +357,29 @@
                         <label for="title">Window title</label>
                         <input id="title" value="hello.ts" maxlength="28">
                     </div>
-                    <div class="field">
-                        <label>Language</label>
-                        <input id="language" type="hidden" value="TypeScript">
-                        <div
-                            class="language-options"
-                            role="group"
-                            aria-label="Syntax highlighting language"
-                        >
-                            <button
-                                class="language-button active"
-                                type="button"
-                                data-language="TypeScript"
-                                aria-label="TypeScript"
-                                aria-pressed="true"
-                                title="TypeScript"
-                            ></button><button
-                                class="language-button"
-                                type="button"
-                                data-language="JavaScript"
-                                aria-label="JavaScript"
-                                aria-pressed="false"
-                                title="JavaScript"
-                            ></button><button
-                                class="language-button"
-                                type="button"
-                                data-language="Python"
-                                aria-label="Python"
-                                aria-pressed="false"
-                                title="Python"
-                            ></button><button
-                                class="language-button"
-                                type="button"
-                                data-language="CSS"
-                                aria-label="CSS"
-                                aria-pressed="false"
-                                title="CSS"
-                            ></button><button
-                                class="language-button"
-                                type="button"
-                                data-language="HTML"
-                                aria-label="HTML"
-                                aria-pressed="false"
-                                title="HTML"
-                            ></button>
+                    <div class="field split">
+                        <div>
+                            <label for="language">Language</label
+                            ><select id="language">
+                                <option>TypeScript</option>
+                                <option>JavaScript</option>
+                                <option>Python</option>
+                                <option>CSS</option>
+                            </select>
                         </div>
-                    </div>
-                    <div class="field">
-                        <label for="theme">Theme</label
-                        ><select id="theme">
-                            <option value="midnight">Midnight</option>
-                            <option value="monokai">Monokai</option>
-                            <option value="darcula">Darcula</option>
-                            <option value="solarized">Solarized</option>
-                            <option value="dracula">Dracula</option>
-                            <option value="nord">Nord</option>
-                            <option value="contrastLight">High Contrast Light</option>
-                            <option value="contrastDark">High Contrast Dark</option>
-                        </select>
+                        <div>
+                            <label for="theme">Theme</label
+                            ><select id="theme">
+                                <option value="midnight">Midnight</option>
+                                <option value="monokai">Monokai</option>
+                                <option value="darcula">Darcula</option>
+                                <option value="solarized">Solarized</option>
+                                <option value="dracula">Dracula</option>
+                                <option value="nord">Nord</option>
+                                <option value="contrastLight">High Contrast Light</option>
+                                <option value="contrastDark">High Contrast Dark</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="field">
                         <label for="font">IDE font</label
@@ -731,6 +604,12 @@ console.log(hello("[[world]]"));</textarea>
         <script type="module">
         import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js";
         import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/controls/OrbitControls.js";
+        import opentype from "https://cdn.jsdelivr.net/npm/opentype.js@1.3.4/dist/opentype.module.js";
+        import hljs from "https://cdn.jsdelivr.net/npm/highlight.js@11.11.1/es/core.min.js";
+        import typescript from "https://cdn.jsdelivr.net/npm/highlight.js@11.11.1/es/languages/typescript.min.js";
+        import javascript from "https://cdn.jsdelivr.net/npm/highlight.js@11.11.1/es/languages/javascript.min.js";
+        import python from "https://cdn.jsdelivr.net/npm/highlight.js@11.11.1/es/languages/python.min.js";
+        import css from "https://cdn.jsdelivr.net/npm/highlight.js@11.11.1/es/languages/css.min.js";
 
         const preview = document.querySelector(".preview"),
             image = document.querySelector("#snapshot"),
@@ -1131,145 +1010,140 @@ console.log(hello("[[world]]"));</textarea>
         const popGroup = new THREE.Group();
         group.add(popGroup);
         function disposePops() {
-            const textures = new Set(),
-                geometries = new Set();
+            const geometries = new Set(),
+                materials = new Set();
             while (popGroup.children.length) {
                 const mesh = popGroup.children.pop();
                 geometries.add(mesh.geometry);
-                textures.add(mesh.material.map);
-                mesh.material.dispose();
+                (Array.isArray(mesh.material) ? mesh.material : [mesh.material]).forEach(
+                    (material) => materials.add(material),
+                );
             }
             geometries.forEach((geometry) => geometry.dispose());
-            textures.forEach((texture) => texture.dispose());
+            materials.forEach((material) => material.dispose());
         }
-        const syntaxTokens = {
-            TypeScript: {
-                keywords: [
-                    "const",
-                    "let",
-                    "return",
-                    "console",
-                    "log",
-                    "function",
-                    "class",
-                    "import",
-                    "from",
-                    "if",
-                    "else",
-                ],
-                types: ["string", "number", "boolean", "true", "false"],
-            },
-            JavaScript: {
-                keywords: [
-                    "const",
-                    "let",
-                    "return",
-                    "console",
-                    "log",
-                    "function",
-                    "class",
-                    "import",
-                    "from",
-                    "if",
-                    "else",
-                ],
-                types: ["true", "false", "null", "undefined"],
-            },
-            Python: {
-                keywords: [
-                    "def",
-                    "return",
-                    "class",
-                    "import",
-                    "from",
-                    "if",
-                    "else",
-                    "for",
-                    "in",
-                    "print",
-                ],
-                types: ["str", "int", "bool", "True", "False", "None"],
-            },
-            CSS: {
-                keywords: [
-                    "color",
-                    "background",
-                    "display",
-                    "position",
-                    "margin",
-                    "padding",
-                    "font",
-                    "grid",
-                    "flex",
-                ],
-                types: ["px", "rem", "vh", "vw"],
-            },
-            HTML: {
-                keywords: [
-                    "html",
-                    "head",
-                    "body",
-                    "div",
-                    "span",
-                    "script",
-                    "style",
-                    "main",
-                    "section",
-                ],
-                types: ["class", "id", "href", "src", "alt"],
-            },
-        };
-        function codeColor(token, theme, language) {
-            const tokens = syntaxTokens[language];
-            return tokens.keywords.includes(token)
-                ? theme.keyword
-                : tokens.types.includes(token)
-                  ? theme.type
-                  : theme.text;
-        }
-        function addFlushText(text, px, y, color, height) {
-            const width = Math.ceil(ctx.measureText(text).width) + 2,
-                tile = document.createElement("canvas"),
-                tileCtx = tile.getContext("2d");
-            tile.width = width;
-            tile.height = 57;
-            tileCtx.font = ctx.font;
-            tileCtx.textBaseline = "middle";
-            tileCtx.fillStyle = color;
-            tileCtx.fillText(text, 0, 28.5);
-            const texture = new THREE.CanvasTexture(tile);
-            texture.colorSpace = THREE.SRGBColorSpace;
-            texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-            const geometry = new THREE.PlaneGeometry(
-                    (tile.width / codeCanvas.width) * contentWidth,
-                    (tile.height / codeCanvas.height) * contentHeight,
-                ),
-                x = -contentWidth / 2 + ((px + tile.width / 2) / codeCanvas.width) * contentWidth,
-                z = 0.171,
-                layers = Math.min(24, Math.max(1, Math.ceil(height / 0.008))),
-                sideColor = new THREE.Color(color).multiplyScalar(0.42),
-                textY = contentTop - (y / codeCanvas.height) * contentHeight;
-            for (let layer = 0; layer < layers; layer++) {
-                const side = new THREE.Mesh(
-                    geometry,
-                    new THREE.MeshBasicMaterial({
-                        map: texture,
-                        color: sideColor,
-                        transparent: true,
-                        alphaTest: 0.01,
-                    }),
-                );
-                side.position.set(x, textY, z + (height * layer) / layers);
-                side.renderOrder = 1;
-                popGroup.add(side);
+        const outlineFonts = new Map(),
+            outlineSources = {
+                "Fira Code":
+                    "https://cdn.jsdelivr.net/gh/tonsky/FiraCode@master/distr/ttf/FiraCode-Regular.ttf",
+                "Reddit Mono":
+                    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/redditmono/RedditMono%5Bwght%5D.ttf",
+                "JetBrains Mono":
+                    "https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono@master/fonts/ttf/JetBrainsMono-Regular.ttf",
+                "IBM Plex Mono":
+                    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/ibmplexmono/IBMPlexMono-Regular.ttf",
+                "Source Code Pro":
+                    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/sourcecodepro/SourceCodePro%5Bwght%5D.ttf",
+                "Roboto Mono":
+                    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/robotomono/RobotoMono%5Bwght%5D.ttf",
+            };
+        async function loadOutlineFont(name) {
+            if (outlineFonts.has(name)) return outlineFonts.get(name);
+            try {
+                const response = await fetch(outlineSources[name]);
+                const font = opentype.parse(await response.arrayBuffer());
+                outlineFonts.set(name, font);
+                return font;
+            } catch {
+                return null;
             }
-            const face = new THREE.Mesh(
-                geometry.clone(),
-                new THREE.MeshBasicMaterial({ map: texture, transparent: true, alphaTest: 0.01 }),
-            );
-            face.position.set(x, textY, z + height);
-            face.renderOrder = 2;
-            popGroup.add(face);
+        }
+        function outlineShapes(font, text, size) {
+            const path = font.getPath(text, 0, 0, size),
+                shapePath = new THREE.ShapePath();
+            path.commands.forEach((command) => {
+                if (command.type === "M") shapePath.moveTo(command.x, -command.y);
+                else if (command.type === "L") shapePath.lineTo(command.x, -command.y);
+                else if (command.type === "C")
+                    shapePath.bezierCurveTo(
+                        command.x1,
+                        -command.y1,
+                        command.x2,
+                        -command.y2,
+                        command.x,
+                        -command.y,
+                    );
+                else if (command.type === "Q")
+                    shapePath.quadraticCurveTo(command.x1, -command.y1, command.x, -command.y);
+                else if (command.type === "Z") shapePath.currentPath?.closePath();
+            });
+            return shapePath.toShapes(true);
+        }
+        hljs.registerLanguage("typescript", typescript);
+        hljs.registerLanguage("javascript", javascript);
+        hljs.registerLanguage("python", python);
+        hljs.registerLanguage("css", css);
+        const languageNames = {
+            TypeScript: "typescript",
+            JavaScript: "javascript",
+            Python: "python",
+            CSS: "css",
+        };
+        function highlightedSegments(code, language) {
+            const template = document.createElement("template");
+            template.innerHTML = hljs.highlight(code, {
+                language: languageNames[language],
+                ignoreIllegals: true,
+            }).value;
+            const segments = [];
+            function walk(node, kind = "plain") {
+                node.childNodes.forEach((child) => {
+                    if (child.nodeType === Node.TEXT_NODE)
+                        segments.push({ text: child.textContent, kind });
+                    else {
+                        const token =
+                            [...child.classList]
+                                .find((name) => name.startsWith("hljs-"))
+                                ?.replace("hljs-", "") || kind;
+                        walk(child, token);
+                    }
+                });
+            }
+            walk(template.content);
+            let offset = 0;
+            return segments.map((segment) => ({
+                ...segment,
+                start: offset,
+                end: (offset += segment.text.length),
+            }));
+        }
+        function syntaxColor(kind, theme) {
+            if (/keyword|literal|built_in|type|meta/.test(kind)) return theme.keyword;
+            if (/string|attr|property|number|symbol/.test(kind)) return theme.type;
+            if (/title|function|class|variable|params/.test(kind))
+                return new THREE.Color(theme.type)
+                    .lerp(new THREE.Color(theme.text), 0.32)
+                    .getStyle();
+            if (/comment/.test(kind)) return theme.muted;
+            return theme.text;
+        }
+        function addExtrudedText(text, px, y, color, height, font, fontSize) {
+            const shapes = outlineShapes(font, text, fontSize),
+                geometry = new THREE.ExtrudeGeometry(shapes, {
+                    depth: height,
+                    bevelEnabled: true,
+                    bevelSegments: 2,
+                    bevelSize: 0.002,
+                    bevelThickness: 0.002,
+                    curveSegments: 5,
+                }),
+                scale = contentWidth / codeCanvas.width,
+                x = -contentWidth / 2 + (px / codeCanvas.width) * contentWidth,
+                baseline = contentTop - ((y + fontSize * 0.35) / codeCanvas.height) * contentHeight;
+            geometry.scale(scale, scale, 1);
+            geometry.translate(x, baseline, 0.171);
+            const sideColor = new THREE.Color(color).multiplyScalar(0.42),
+                mesh = new THREE.Mesh(geometry, [
+                    new THREE.MeshBasicMaterial({ color }),
+                    new THREE.MeshStandardMaterial({
+                        color: sideColor,
+                        roughness: 0.52,
+                        metalness: 0.08,
+                    }),
+                ]);
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            popGroup.add(mesh);
         }
         function draw() {
             const code = document.querySelector("#code").value,
@@ -1279,6 +1153,7 @@ console.log(hello("[[world]]"));</textarea>
                 fontName = document.querySelector("#font").value,
                 fontSize = Number(document.querySelector("#font-size").value),
                 popHeight = Number(document.querySelector("#pop-height").value),
+                outlineFont = outlineFonts.get(fontName),
                 editorFont = `"${fontName}", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace`;
             document.documentElement.style.setProperty("--editor-font", `"${fontName}"`);
             scene.background.set(theme.bg);
@@ -1291,29 +1166,55 @@ console.log(hello("[[world]]"));</textarea>
             ctx.font = `${fontSize}px ${editorFont}`;
             ctx.textBaseline = "middle";
             disposePops();
-            const syntaxPattern = new RegExp(
-                    `(${[...syntaxTokens[language].keywords, ...syntaxTokens[language].types].join("|")})`,
-                ),
+            const cleanCode = code.replace(/\[\[(.*?)\]\]/g, "$1"),
+                segments = highlightedSegments(cleanCode, language),
+                cleanLines = cleanCode.split("\n"),
                 lineHeight = fontSize * (57 / 31);
-            const lines = code.split("\n");
-            lines.forEach((rawLine, i) => {
-                const line = rawLine.replace(/\[\[(.*?)\]\]/g, "$1");
-                let y = 76 + i * lineHeight;
+            cleanLines.forEach((_, index) => {
                 ctx.fillStyle = theme.muted;
-                ctx.fillText(String(i + 1).padStart(2, " "), 45, y);
-                const chunks = line.split(syntaxPattern);
-                let x = 142;
-                chunks.forEach((chunk) => {
-                    ctx.fillStyle = codeColor(chunk, theme, language);
-                    ctx.fillText(chunk, x, y);
-                    x += ctx.measureText(chunk).width;
-                });
-                [...rawLine.matchAll(/\[\[(.*?)\]\]/g)].forEach((match) => {
-                    const before = rawLine.slice(0, match.index).replace(/\[\[(.*?)\]\]/g, "$1"),
-                        px = 142 + ctx.measureText(before).width;
-                    addFlushText(match[1], px, y, codeColor(match[1], theme, language), popHeight);
+                ctx.fillText(String(index + 1).padStart(2, " "), 45, 76 + index * lineHeight);
+            });
+            let lineIndex = 0,
+                x = 142;
+            segments.forEach((segment) => {
+                segment.text.split("\n").forEach((part, index) => {
+                    if (index) {
+                        lineIndex++;
+                        x = 142;
+                    }
+                    if (part) {
+                        ctx.fillStyle = syntaxColor(segment.kind, theme);
+                        ctx.fillText(part, x, 76 + lineIndex * lineHeight);
+                        x += ctx.measureText(part).width;
+                    }
                 });
             });
+            if (outlineFont) {
+                let cleanStart = 0;
+                code.split("\n").forEach((rawLine, index) => {
+                    const cleanLine = rawLine.replace(/\[\[(.*?)\]\]/g, "$1");
+                    [...rawLine.matchAll(/\[\[(.*?)\]\]/g)].forEach((match) => {
+                        const before = rawLine
+                                .slice(0, match.index)
+                                .replace(/\[\[(.*?)\]\]/g, "$1"),
+                            px = 142 + ctx.measureText(before).width,
+                            start = cleanStart + before.length,
+                            segment = segments.find(
+                                (item) => start >= item.start && start < item.end,
+                            );
+                        addExtrudedText(
+                            match[1],
+                            px,
+                            76 + index * lineHeight,
+                            syntaxColor(segment?.kind || "plain", theme),
+                            popHeight,
+                            outlineFont,
+                            fontSize,
+                        );
+                    });
+                    cleanStart += cleanLine.length + 1;
+                });
+            }
             codeTexture.needsUpdate = true;
             const t = titleTexture.image.getContext("2d");
             t.clearRect(0, 0, 600, 80);
@@ -1463,7 +1364,10 @@ console.log(hello("[[world]]"));</textarea>
         document
             .querySelector("#font")
             .addEventListener("change", () =>
-                document.fonts.load(`31px "${document.querySelector("#font").value}"`).then(update),
+                Promise.all([
+                    document.fonts.load(`31px "${document.querySelector("#font").value}"`),
+                    loadOutlineFont(document.querySelector("#font").value),
+                ]).then(update),
             );
         document.querySelectorAll(".camera-button").forEach((button) =>
             button.addEventListener("click", () => {
@@ -1495,19 +1399,11 @@ console.log(hello("[[world]]"));</textarea>
             a.click();
         });
         new ResizeObserver(snapshot).observe(preview);
-        document.fonts.ready.then(update);
+        Promise.all([
+            document.fonts.ready,
+            loadOutlineFont(document.querySelector("#font").value),
+        ]).then(update);
         update();
-        document.querySelectorAll(".language-button").forEach((button) =>
-            button.addEventListener("click", () => {
-                document.querySelector("#language").value = button.dataset.language;
-                document.querySelectorAll(".language-button").forEach((item) => {
-                    const isActive = item === button;
-                    item.classList.toggle("active", isActive);
-                    item.setAttribute("aria-pressed", isActive);
-                });
-                scheduleUpdate();
-            }),
-        );
         </script>
     </body>
 </html>
