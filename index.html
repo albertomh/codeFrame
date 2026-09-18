@@ -223,6 +223,16 @@
                         </select>
                     </div>
                     <div class="field">
+                        <label for="camera">Camera</label
+                        ><select id="camera">
+                            <option value="studio">Studio angle</option>
+                            <option value="front">Front</option>
+                            <option value="left">Left angle</option>
+                            <option value="right">Right angle</option>
+                            <option value="high">High angle</option>
+                        </select>
+                    </div>
+                    <div class="field">
                         <label for="code">Snippet</label>
                         <p class="hint code-hint">
                             Wrap text in <code>[[double brackets]]</code> to render it as a flush 3D
@@ -316,13 +326,13 @@ console.log(hello("[[world]]"));</textarea>
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(themes.midnight.bg);
         const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
-        camera.position.set(0, 1.2, 10.2);
         const renderer = new THREE.WebGLRenderer({
             antialias: true,
             preserveDrawingBuffer: true,
             alpha: false,
         });
-        renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+        renderer.setPixelRatio(Math.min(3, Math.max(2, devicePixelRatio || 1)));
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         const group = new THREE.Group();
@@ -415,6 +425,7 @@ console.log(hello("[[world]]"));</textarea>
         codeCanvas.height = 800;
         const codeTexture = new THREE.CanvasTexture(codeCanvas);
         codeTexture.colorSpace = THREE.SRGBColorSpace;
+        codeTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
         const codeMesh = new THREE.Mesh(
             new THREE.PlaneGeometry(6.72, 3.42),
             new THREE.MeshBasicMaterial({ map: codeTexture, transparent: true }),
@@ -480,6 +491,7 @@ console.log(hello("[[world]]"));</textarea>
             tileCtx.fillText(text, 0, 28.5);
             const texture = new THREE.CanvasTexture(tile);
             texture.colorSpace = THREE.SRGBColorSpace;
+            texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
             const mesh = new THREE.Mesh(
                 new THREE.PlaneGeometry((tile.width / 1400) * 6.72, (tile.height / 800) * 3.42),
                 new THREE.MeshBasicMaterial({ map: texture, transparent: true, depthWrite: false }),
@@ -548,6 +560,18 @@ console.log(hello("[[world]]"));</textarea>
             t.fillText(title, 300, 40);
             titleTexture.needsUpdate = true;
         }
+        const cameraPresets = {
+            studio: [5.5, 3.5, 10.5],
+            front: [0, 1.2, 11.2],
+            left: [-6, 2.8, 9.4],
+            right: [6, 2.8, 9.4],
+            high: [2.4, 6.8, 8.8],
+        };
+        function applyCamera() {
+            const [x, y, z] = cameraPresets[document.querySelector("#camera").value];
+            camera.position.set(x, y, z);
+            camera.lookAt(0, 0.05, 0);
+        }
         function snapshot() {
             const w = preview.clientWidth,
                 h = preview.clientHeight;
@@ -559,6 +583,7 @@ console.log(hello("[[world]]"));</textarea>
         }
         function update() {
             draw();
+            applyCamera();
             snapshot();
         }
         let updateTimer;
