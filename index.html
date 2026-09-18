@@ -395,7 +395,8 @@ console.log(hello("[[world]]"));</textarea>
                 new THREE.ExtrudeGeometry(roundedShape(7.3, 4.6, 0.28), {
                     depth: 0.18,
                     bevelEnabled: true,
-                    bevelSegments: 3,
+                    curveSegments: 48,
+                    bevelSegments: 8,
                     bevelSize: 0.07,
                     bevelThickness: 0.08,
                 }),
@@ -407,14 +408,14 @@ console.log(hello("[[world]]"));</textarea>
         group.add(body);
         const screenMaterial = new THREE.MeshBasicMaterial({ color: themes.midnight.screen }),
             screen = new THREE.Mesh(
-                new THREE.ShapeGeometry(roundedShape(7.06, 4.36, 0.2)),
+                new THREE.ShapeGeometry(roundedShape(7.06, 4.36, 0.2), 48),
                 screenMaterial,
             );
         screen.position.z = 0.15;
         group.add(screen);
         const barMaterial = new THREE.MeshBasicMaterial({ color: themes.midnight.bar }),
             topbar = new THREE.Mesh(
-                new THREE.ShapeGeometry(titlebarShape(7.06, 0.64, 0.2)),
+                new THREE.ShapeGeometry(titlebarShape(7.06, 0.64, 0.2), 48),
                 barMaterial,
             );
         topbar.position.set(0, 1.84, 0.161);
