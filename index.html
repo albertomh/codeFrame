@@ -72,11 +72,57 @@
                 0 24px 80px rgba(0, 0, 0, 0.38),
                 inset 0 1px 0 rgba(255, 255, 255, 0.06);
         }
-        #snapshot {
+        #snapshot,
+        .live-canvas {
+            position: absolute;
+            inset: 0;
             display: block;
             width: 100%;
             height: 100%;
             object-fit: cover;
+        }
+        .live-canvas {
+            z-index: 1;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .live-canvas.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #nav-gizmo {
+            position: absolute;
+            z-index: 2;
+            right: 18px;
+            bottom: 18px;
+            display: none;
+            width: 70px;
+            height: 70px;
+            place-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 50%;
+            color: #dce8fb;
+            background: radial-gradient(circle at 35% 28%, #4a5c7d, #172238 65%);
+            box-shadow:
+                0 8px 22px rgba(0, 0, 0, 0.35),
+                inset 0 1px 1px rgba(255, 255, 255, 0.18);
+            cursor: grab;
+            touch-action: none;
+        }
+        #nav-gizmo.active {
+            display: grid;
+        }
+        #nav-gizmo:active {
+            cursor: grabbing;
+        }
+        #nav-gizmo svg {
+            width: 52px;
+            height: 52px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.45;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
         aside {
             align-self: start;
@@ -278,7 +324,22 @@
         <main>
             <header><div class="brand">codeShowcase</div></header>
             <section class="workspace">
-                <div class="preview"><img id="snapshot" alt="Rendered 3D code snippet card"></div>
+                <div class="preview">
+                    <img id="snapshot" alt="Rendered 3D code snippet card">
+                    <div
+                        id="nav-gizmo"
+                        role="application"
+                        aria-label="Viewport navigation gizmo: drag to rotate the view"
+                        title="Drag to rotate"
+                    >
+                        <svg viewBox="0 0 64 64">
+                            <circle cx="32" cy="32" r="17" />
+                            <path
+                                d="M12 28a22 22 0 0 1 35-13M47 15l1 8-8-1M52 36a22 22 0 0 1-35 13M17 49l-1-8 8 1M32 15v34M15 32h34"
+                            />
+                        </svg>
+                    </div>
+                </div>
                 <aside>
                     <div class="field">
                         <label for="title">Window title</label>
@@ -464,7 +525,8 @@ console.log(hello("[[world]]"));</textarea>
         import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/controls/OrbitControls.js";
 
         const preview = document.querySelector(".preview"),
-            image = document.querySelector("#snapshot");
+            image = document.querySelector("#snapshot"),
+            gizmo = document.querySelector("#nav-gizmo");
         const themes = {
             midnight: {
                 bg: "#101624",
@@ -559,14 +621,18 @@ console.log(hello("[[world]]"));</textarea>
         renderer.outputColorSpace = THREE.SRGBColorSpace;
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        const controls = new OrbitControls(camera, image);
+        renderer.domElement.className = "live-canvas";
+        preview.append(renderer.domElement);
+        const controls = new OrbitControls(camera, gizmo);
         controls.enableDamping = false;
         controls.enablePan = false;
         controls.minDistance = 8;
         controls.maxDistance = 16;
         controls.target.set(0, 0.05, 0);
         controls.enabled = false;
-        controls.addEventListener("change", snapshot);
+        controls.addEventListener("change", () => {
+            if (activeCamera === "free") renderer.render(scene, camera);
+        });
         const group = new THREE.Group();
         scene.add(group);
         scene.add(new THREE.HemisphereLight("#b8cbff", "#1b1a29", 1.8));
@@ -615,8 +681,15 @@ console.log(hello("[[world]]"));</textarea>
             s.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
             s.lineTo(x + r, y + h);
             s.quadraticCurveTo(x, y + h, x, y + h - r);
+            s.lineTo(x, y + r);
             s.lineTo(x, y);
             return s;
+        }
+        function frameShape() {
+            const frame = roundedShape(7.3, 4.6, 0.28),
+                hole = new THREE.Path(roundedShape(7.06, 4.36, 0.2).getPoints(48).reverse());
+            frame.holes.push(hole);
+            return frame;
         }
         const bodyMaterial = new THREE.MeshStandardMaterial({
                 color: themes.midnight.body,
@@ -624,33 +697,43 @@ console.log(hello("[[world]]"));</textarea>
                 roughness: 0.34,
             }),
             body = new THREE.Mesh(
-                new THREE.ExtrudeGeometry(roundedShape(7.3, 4.6, 0.28), {
-                    depth: 0.18,
+                new THREE.ExtrudeGeometry(frameShape(), {
+                    depth: 0.035,
                     bevelEnabled: true,
                     curveSegments: 48,
-                    bevelSegments: 8,
-                    bevelSize: 0.07,
-                    bevelThickness: 0.08,
+                    bevelSegments: 6,
+                    bevelSize: 0.018,
+                    bevelThickness: 0.018,
                 }),
                 bodyMaterial,
             );
-        body.position.z = -0.12;
+        body.position.z = 0.14;
         body.castShadow = true;
         body.receiveShadow = true;
         group.add(body);
-        const screenMaterial = new THREE.MeshBasicMaterial({ color: themes.midnight.screen }),
+        const screenMaterial = new THREE.MeshStandardMaterial({
+                color: themes.midnight.screen,
+                roughness: 0.82,
+                metalness: 0,
+            }),
             screen = new THREE.Mesh(
                 new THREE.ShapeGeometry(roundedShape(7.06, 4.36, 0.2), 48),
                 screenMaterial,
             );
         screen.position.z = 0.15;
+        screen.receiveShadow = true;
         group.add(screen);
-        const barMaterial = new THREE.MeshBasicMaterial({ color: themes.midnight.bar }),
+        const barMaterial = new THREE.MeshStandardMaterial({
+                color: themes.midnight.bar,
+                roughness: 0.7,
+                metalness: 0.05,
+            }),
             topbar = new THREE.Mesh(
-                new THREE.ShapeGeometry(titlebarShape(7.06, 0.64, 0.2), 48),
+                new THREE.ShapeGeometry(titlebarShape(7.06, 0.48, 0.2), 48),
                 barMaterial,
             );
-        topbar.position.set(0, 1.84, 0.161);
+        topbar.position.set(0, 1.92, 0.161);
+        topbar.receiveShadow = true;
         group.add(topbar);
         const codeCanvas = document.createElement("canvas"),
             ctx = codeCanvas.getContext("2d");
@@ -680,7 +763,7 @@ console.log(hello("[[world]]"));</textarea>
                 }),
             );
             dot.rotation.x = Math.PI / 2;
-            dot.position.set(x, 1.84, 0.3);
+            dot.position.set(x, 1.92, 0.183);
             dot.castShadow = true;
             group.add(dot);
         });
@@ -691,7 +774,7 @@ console.log(hello("[[world]]"));</textarea>
             new THREE.PlaneGeometry(2.5, 0.33),
             new THREE.MeshBasicMaterial({ map: titleTexture, transparent: true }),
         );
-        titleMesh.position.set(0.25, 1.84, 0.18);
+        titleMesh.position.set(0.25, 1.92, 0.18);
         group.add(titleMesh);
         const popGroup = new THREE.Group();
         group.add(popGroup);
@@ -900,11 +983,14 @@ console.log(hello("[[world]]"));</textarea>
         function applyCamera() {
             if (activeCamera === "free") {
                 controls.enabled = true;
-                image.style.cursor = "grab";
+                controls.update();
+                gizmo.classList.add("active");
+                renderer.domElement.classList.add("active");
                 return;
             }
             controls.enabled = false;
-            image.style.cursor = "default";
+            gizmo.classList.remove("active");
+            renderer.domElement.classList.remove("active");
             const [x, y, z] = cameraPresets[activeCamera];
             camera.position.set(x, y, z);
             camera.lookAt(0, 0.05, 0);
