@@ -81,6 +81,9 @@
             height: 100%;
             object-fit: cover;
         }
+        .preview.free-view #snapshot {
+            visibility: hidden;
+        }
         .live-canvas {
             z-index: 1;
             opacity: 0;
@@ -330,6 +333,41 @@
         .language-button[data-language="HTML"] {
             --language-icon: url("https://cdn.jsdelivr.net/npm/simple-icons@15.15.0/icons/html5.svg");
         }
+        .camera-options {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 7px;
+        }
+        .camera-button {
+            display: grid;
+            place-items: center;
+            aspect-ratio: 1.25;
+            padding: 0;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 9px;
+            color: #aebbd0;
+            background: #0d1422;
+            box-shadow: none;
+        }
+        .camera-button:hover {
+            color: #fff;
+            background: #172238;
+        }
+        .camera-button.active {
+            color: #091019;
+            background: #8bf0be;
+            border-color: #8bf0be;
+            box-shadow: 0 5px 13px rgba(88, 229, 162, 0.16);
+        }
+        .camera-button svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.7;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
         .camera-button.free-view .axis-x {
             stroke: #7181ff;
         }
@@ -554,6 +592,78 @@
                                     <circle class="axis-y" cx="12" cy="5" r="2.1" />
                                     <path class="axis-z" d="m12 13-7 4" />
                                     <circle class="axis-z" cx="5" cy="17" r="2.1" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Lighting</label>
+                        <div class="lighting-options" role="group" aria-label="Scene lighting">
+                            <button
+                                class="lighting-button active"
+                                type="button"
+                                data-lighting="studio"
+                                aria-label="Studio lighting"
+                                aria-pressed="true"
+                                title="Studio"
+                            >
+                                <svg viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="3" />
+                                    <path
+                                        d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"
+                                    />
+                                </svg>
+                            </button>
+                            <button
+                                class="lighting-button"
+                                type="button"
+                                data-lighting="soft"
+                                aria-label="Soft lighting"
+                                aria-pressed="false"
+                                title="Soft"
+                            >
+                                <svg viewBox="0 0 24 24">
+                                    <path
+                                        d="M6 17h11a4 4 0 0 0 .4-8A5.5 5.5 0 0 0 7 10.5 3.3 3.3 0 0 0 6 17z"
+                                    />
+                                </svg>
+                            </button>
+                            <button
+                                class="lighting-button"
+                                type="button"
+                                data-lighting="sunset"
+                                aria-label="Sunset lighting"
+                                aria-pressed="false"
+                                title="Sunset"
+                            >
+                                <svg viewBox="0 0 24 24">
+                                    <path
+                                        d="M3 18h18M6 14a6 6 0 0 1 12 0M12 4v3M5 7l2 2M19 7l-2 2"
+                                    />
+                                </svg>
+                            </button>
+                            <button
+                                class="lighting-button"
+                                type="button"
+                                data-lighting="noir"
+                                aria-label="Noir lighting"
+                                aria-pressed="false"
+                                title="Noir"
+                            >
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M16 4a7 7 0 1 0 4 12A7 7 0 0 1 16 4z" />
+                                </svg>
+                            </button>
+                            <button
+                                class="lighting-button"
+                                type="button"
+                                data-lighting="neon"
+                                aria-label="Neon lighting"
+                                aria-pressed="false"
+                                title="Neon"
+                            >
+                                <svg viewBox="0 0 24 24">
+                                    <path d="m13 2-9 12h7l-1 8 10-13h-7z" />
                                 </svg>
                             </button>
                         </div>
@@ -865,7 +975,8 @@ console.log(hello("[[world]]"));</textarea>
         });
         const group = new THREE.Group();
         scene.add(group);
-        scene.add(new THREE.HemisphereLight("#b8cbff", "#1b1a29", 1.8));
+        const ambient = new THREE.HemisphereLight("#b8cbff", "#1b1a29", 1.8);
+        scene.add(ambient);
         const key = new THREE.DirectionalLight("#e5eeff", 3.1);
         key.position.set(-4, 6, 6);
         key.castShadow = true;
@@ -1205,6 +1316,70 @@ console.log(hello("[[world]]"));</textarea>
             right: [6, 2.8, 9.4],
         };
         let activeCamera = "front";
+        const lightingModes = {
+            studio: {
+                sky: "#b8cbff",
+                ground: "#1b1a29",
+                ambient: 1.8,
+                key: "#e5eeff",
+                keyIntensity: 3.1,
+                keyPosition: [-4, 6, 6],
+                rim: "#718bff",
+                rimIntensity: 22,
+            },
+            soft: {
+                sky: "#fff5e6",
+                ground: "#25283a",
+                ambient: 2.5,
+                key: "#fff0d5",
+                keyIntensity: 2,
+                keyPosition: [-3, 5, 7],
+                rim: "#b5c8ff",
+                rimIntensity: 10,
+            },
+            sunset: {
+                sky: "#ffb46e",
+                ground: "#28152e",
+                ambient: 1.45,
+                key: "#ff875f",
+                keyIntensity: 3.5,
+                keyPosition: [-5, 3, 6],
+                rim: "#9966ff",
+                rimIntensity: 28,
+            },
+            noir: {
+                sky: "#bac7da",
+                ground: "#07090e",
+                ambient: 0.45,
+                key: "#f0f5ff",
+                keyIntensity: 4.5,
+                keyPosition: [-5, 5, 4],
+                rim: "#536a94",
+                rimIntensity: 4,
+            },
+            neon: {
+                sky: "#2d164f",
+                ground: "#090515",
+                ambient: 1.1,
+                key: "#00e5ff",
+                keyIntensity: 3,
+                keyPosition: [-4, 4, 5],
+                rim: "#ff30d7",
+                rimIntensity: 38,
+            },
+        };
+        let activeLighting = "studio";
+        function applyLighting() {
+            const mode = lightingModes[activeLighting];
+            ambient.color.set(mode.sky);
+            ambient.groundColor.set(mode.ground);
+            ambient.intensity = mode.ambient;
+            key.color.set(mode.key);
+            key.intensity = mode.keyIntensity;
+            key.position.set(...mode.keyPosition);
+            rim.color.set(mode.rim);
+            rim.intensity = mode.rimIntensity;
+        }
         function applyCamera() {
             if (activeCamera === "free") {
                 controls.enabled = true;
@@ -1236,6 +1411,7 @@ console.log(hello("[[world]]"));</textarea>
         }
         function update() {
             draw();
+            applyLighting();
             applyCamera();
             snapshot();
         }
@@ -1278,6 +1454,17 @@ console.log(hello("[[world]]"));</textarea>
             button.addEventListener("click", () => {
                 activeCamera = button.dataset.camera;
                 document.querySelectorAll(".camera-button").forEach((item) => {
+                    const isActive = item === button;
+                    item.classList.toggle("active", isActive);
+                    item.setAttribute("aria-pressed", isActive);
+                });
+                scheduleUpdate();
+            }),
+        );
+        document.querySelectorAll(".lighting-button").forEach((button) =>
+            button.addEventListener("click", () => {
+                activeLighting = button.dataset.lighting;
+                document.querySelectorAll(".lighting-button").forEach((item) => {
                     const isActive = item === button;
                     item.classList.toggle("active", isActive);
                     item.setAttribute("aria-pressed", isActive);
