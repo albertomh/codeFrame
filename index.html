@@ -108,6 +108,10 @@
             font: inherit;
             outline: none;
         }
+        input[type="range"] {
+            padding: 0;
+            accent-color: #8bf0be;
+        }
         input:focus,
         textarea:focus,
         select:focus {
@@ -407,6 +411,18 @@
                                 </svg>
                             </button>
                         </div>
+                    </div>
+                    <div class="field">
+                        <label for="pop-height"
+                            >3D text height <output id="pop-height-value">0.011</output></label
+                        ><input
+                            id="pop-height"
+                            type="range"
+                            min="0"
+                            max="0.3"
+                            step="0.001"
+                            value="0.011"
+                        >
                     </div>
                     <div class="field">
                         <label for="code">Snippet</label>
@@ -732,7 +748,7 @@ console.log(hello("[[world]]"));</textarea>
                   ? theme.type
                   : theme.text;
         }
-        function addFlushText(text, px, y, color) {
+        function addFlushText(text, px, y, color, height) {
             const width = Math.ceil(ctx.measureText(text).width) + 2,
                 tile = document.createElement("canvas"),
                 tileCtx = tile.getContext("2d");
@@ -752,7 +768,7 @@ console.log(hello("[[world]]"));</textarea>
             mesh.position.set(
                 0.05 - 3.36 + ((px + tile.width / 2) / 1400) * 6.72,
                 -0.28 + 1.71 - (y / 800) * 3.42,
-                0.181,
+                0.17 + height,
             );
             mesh.renderOrder = 1;
             popGroup.add(mesh);
@@ -763,6 +779,7 @@ console.log(hello("[[world]]"));</textarea>
                 language = document.querySelector("#language").value,
                 theme = themes[document.querySelector("#theme").value],
                 fontName = document.querySelector("#font").value,
+                popHeight = Number(document.querySelector("#pop-height").value),
                 editorFont = `"${fontName}", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace`;
             document.documentElement.style.setProperty("--editor-font", `"${fontName}"`);
             scene.background.set(theme.bg);
@@ -794,7 +811,7 @@ console.log(hello("[[world]]"));</textarea>
                 [...rawLine.matchAll(/\[\[(.*?)\]\]/g)].forEach((match) => {
                     const before = rawLine.slice(0, match.index).replace(/\[\[(.*?)\]\]/g, "$1"),
                         px = 142 + ctx.measureText(before).width;
-                    addFlushText(match[1], px, y, codeColor(match[1], theme, language));
+                    addFlushText(match[1], px, y, codeColor(match[1], theme, language), popHeight);
                 });
             });
             codeTexture.needsUpdate = true;
@@ -842,6 +859,15 @@ console.log(hello("[[world]]"));</textarea>
         document
             .querySelectorAll("input, textarea, select")
             .forEach((field) => field.addEventListener("input", scheduleUpdate));
+        document
+            .querySelector("#pop-height")
+            .addEventListener(
+                "input",
+                (event) =>
+                    (document.querySelector("#pop-height-value").value = Number(
+                        event.target.value,
+                    ).toFixed(3)),
+            );
         document
             .querySelector("#font")
             .addEventListener("change", () =>
