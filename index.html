@@ -71,7 +71,7 @@
             color: var(--ink);
         }
         main {
-            width: min(1180px, calc(100% - 40px));
+            width: min(1280px, calc(100% - 40px));
             height: 100vh;
             margin: auto;
             padding: 24px 0;
@@ -91,11 +91,14 @@
         .workspace {
             display: grid;
             grid-template-columns: minmax(0, 1fr) 300px;
+            grid-template-rows: minmax(0, 1fr);
             height: 100%;
+            min-height: 0;
             gap: 22px;
         }
         .preview {
             min-height: 0;
+            height: 100%;
             position: relative;
             overflow: hidden;
             border: 1px solid var(--line);
@@ -133,7 +136,7 @@
             z-index: 2;
             right: 14px;
             bottom: 14px;
-            display: none;
+            display: grid;
             width: 118px;
             height: 118px;
             overflow: hidden;
@@ -145,9 +148,6 @@
                 inset 0 1px 1px rgba(255, 255, 255, 0.12);
             cursor: grab;
             touch-action: none;
-        }
-        #nav-gizmo.active {
-            display: grid;
         }
         #nav-gizmo:active {
             cursor: grabbing;
@@ -162,8 +162,10 @@
             z-index: 2;
             left: 14px;
             bottom: 14px;
-            display: none;
-            width: 52px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            width: 58px;
             padding: 6px 8px;
             border: 1px solid rgba(255, 255, 255, 0.14);
             border-radius: 7px;
@@ -175,14 +177,29 @@
             font-variant-numeric: tabular-nums;
             text-align: right;
         }
-        #zoom-indicator.active {
-            display: block;
+        #zoom-indicator svg {
+            width: 13px;
+            height: 13px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.9;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        #zoom-indicator output {
+            margin-left: auto;
+        }
+        .preview.overlays-hidden #nav-gizmo,
+        .preview.overlays-hidden #zoom-indicator {
+            display: none;
         }
         aside {
             align-self: stretch;
             display: flex;
             flex-direction: column;
             height: 100%;
+            min-height: 0;
+            overflow: hidden;
             padding: 18px;
             border: 1px solid var(--line);
             border-radius: 18px;
@@ -192,8 +209,9 @@
         }
         .accordion {
             display: flex;
-            flex: 0 0 auto;
+            flex: 1 1 auto;
             min-height: 0;
+            overflow: auto;
             flex-direction: column;
             gap: 8px;
         }
@@ -360,6 +378,34 @@
             grid-template-columns: repeat(5, 1fr);
             gap: 7px;
         }
+        .overlay-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 9px;
+            background: #0d1422;
+        }
+        .overlay-button {
+            padding: 7px 9px;
+            border: 0;
+            border-radius: 0;
+            color: #aebbd0;
+            background: transparent;
+            box-shadow: none;
+            font-size: 10px;
+            letter-spacing: 0.08em;
+        }
+        .overlay-button:hover {
+            color: #fff;
+            background: #172238;
+        }
+        .overlay-button.active {
+            color: #091019;
+            background: #8bf0be;
+            box-shadow: none;
+        }
         .camera-button,
         .lighting-button,
         .background-button,
@@ -495,7 +541,12 @@
             <section class="workspace">
                 <div class="preview">
                     <img id="snapshot" alt="Rendered 3D code snippet card">
-                    <div id="zoom-indicator" aria-live="polite">0%</div>
+                    <div id="zoom-indicator" aria-live="polite">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="11" cy="11" r="6.5" />
+                            <path d="m16 16 4 4" />
+                        </svg><output>0%</output>
+                    </div>
                     <div
                         id="nav-gizmo"
                         role="application"
@@ -813,21 +864,41 @@ console.log(hello("[[world]]"));</textarea>
                                             </svg>
                                         </button>
                                         <button
-                                            class="camera-button free-view"
+                                            class="camera-button"
                                             type="button"
-                                            data-camera="free"
-                                            aria-label="Free view: drag preview to rotate"
+                                            data-camera="monolith"
+                                            aria-label="Monolith view"
                                             aria-pressed="false"
-                                            title="Free view"
+                                            title="Monolith"
                                         >
                                             <svg viewBox="0 0 24 24">
-                                                <path class="axis-x" d="m12 13 7 4" />
-                                                <circle class="axis-x" cx="19" cy="17" r="2.1" />
-                                                <path class="axis-y" d="M12 13V5" />
-                                                <circle class="axis-y" cx="12" cy="5" r="2.1" />
-                                                <path class="axis-z" d="m12 13-7 4" />
-                                                <circle class="axis-z" cx="5" cy="17" r="2.1" />
+                                                <path d="M6 20 9 5h6l3 15z" />
+                                                <path d="M9 5 12 2l3 3M12 2v12" />
                                             </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label>Overlays</label>
+                                    <div
+                                        class="overlay-options"
+                                        role="group"
+                                        aria-label="Viewport overlays"
+                                    >
+                                        <button
+                                            class="overlay-button active"
+                                            type="button"
+                                            data-overlays="show"
+                                            aria-pressed="true"
+                                        >
+                                            SHOW
+                                        </button><button
+                                            class="overlay-button"
+                                            type="button"
+                                            data-overlays="hide"
+                                            aria-pressed="false"
+                                        >
+                                            HIDE
                                         </button>
                                     </div>
                                 </div>
@@ -1212,21 +1283,21 @@ console.log(hello("[[world]]"));</textarea>
                 percent = Math.round(
                     ((zoomLimits.max - distance) / (zoomLimits.max - zoomLimits.min)) * 100,
                 );
-            zoomIndicator.textContent = `${THREE.MathUtils.clamp(percent, 0, 100)}%`;
+            zoomIndicator.querySelector("output").textContent =
+                `${THREE.MathUtils.clamp(percent, 0, 100)}%`;
         }
         const controls = new OrbitControls(camera, gizmoRenderer.domElement);
         controls.enableDamping = false;
         controls.enablePan = false;
+        controls.enableZoom = true;
         controls.minDistance = zoomLimits.min;
         controls.maxDistance = zoomLimits.max;
         controls.target.set(0, 0.05, 0);
-        controls.enabled = false;
+        controls.enabled = true;
         controls.addEventListener("change", () => {
-            if (activeCamera === "free") {
-                renderer.render(scene, camera);
-                renderGizmo();
-                updateZoomIndicator();
-            }
+            snapshot();
+            renderGizmo();
+            updateZoomIndicator();
         });
         renderer.domElement.addEventListener(
             "wheel",
@@ -1390,9 +1461,9 @@ console.log(hello("[[world]]"));</textarea>
             s.quadraticCurveTo(x, y, x, y + r);
             return s;
         }
-        function frameShape() {
-            const frame = roundedShape(7.3, 4.6, 0.28),
-                hole = new THREE.Path(roundedShape(7.06, 4.36, 0.2).getPoints(48).reverse());
+        function frameShape(w) {
+            const frame = roundedShape(w + 0.24, 4.6, 0.28),
+                hole = new THREE.Path(roundedShape(w, 4.36, 0.2).getPoints(48).reverse());
             frame.holes.push(hole);
             return frame;
         }
@@ -1402,7 +1473,7 @@ console.log(hello("[[world]]"));</textarea>
                 roughness: 0.34,
             }),
             body = new THREE.Mesh(
-                new THREE.ExtrudeGeometry(frameShape(), {
+                new THREE.ExtrudeGeometry(frameShape(7.06), {
                     depth: 0.035,
                     bevelEnabled: true,
                     curveSegments: 48,
@@ -1440,8 +1511,8 @@ console.log(hello("[[world]]"));</textarea>
         topbar.position.set(0, 1.95, 0.161);
         topbar.receiveShadow = true;
         group.add(topbar);
-        const contentWidth = 7.06,
-            contentHeight = 3.92,
+        let contentWidth = 7.06;
+        const contentHeight = 3.92,
             contentTop = 1.74,
             codeCanvas = document.createElement("canvas"),
             ctx = codeCanvas.getContext("2d"),
@@ -1452,19 +1523,17 @@ console.log(hello("[[world]]"));</textarea>
         const codeTexture = new THREE.CanvasTexture(codeCanvas);
         codeTexture.colorSpace = THREE.SRGBColorSpace;
         codeTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-        codeTexture.repeat.set(1 / contentWidth, 1 / contentHeight);
-        codeTexture.offset.set(0.5, 0.5);
+        codeTexture.repeat.set(1, 1);
+        codeTexture.offset.set(0, 0);
         const codeMesh = new THREE.Mesh(
-            new THREE.ShapeGeometry(contentShape(contentWidth, contentHeight, 0.2), 48),
-            new THREE.MeshBasicMaterial({ map: codeTexture, transparent: true }),
+            new THREE.PlaneGeometry(contentWidth, contentHeight),
+            new THREE.MeshBasicMaterial({ map: codeTexture, depthWrite: false }),
         );
-        codeMesh.position.set(0, -0.22, 0.17);
+        codeMesh.position.set(0, -0.22, 0.19);
+        codeMesh.renderOrder = 1;
         group.add(codeMesh);
-        [
-            ["#ff6259", -3.12],
-            ["#ffbd44", -2.88],
-            ["#00ca4e", -2.64],
-        ].forEach(([color, x]) => {
+        const trafficLights = [];
+        ["#ff6259", "#ffbd44", "#00ca4e"].forEach((color, index) => {
             const dot = new THREE.Mesh(
                 new THREE.CylinderGeometry(0.075, 0.075, 0.04, 64, 1, false),
                 new THREE.MeshStandardMaterial({
@@ -1475,10 +1544,11 @@ console.log(hello("[[world]]"));</textarea>
                 }),
             );
             dot.rotation.x = Math.PI / 2;
-            dot.position.set(x, 1.95, 0.183);
+            dot.position.set(-3.12 + index * 0.24, 1.95, 0.183);
             dot.castShadow = true;
             dot.renderOrder = 3;
             group.add(dot);
+            trafficLights.push(dot);
         });
         const titleTexture = new THREE.CanvasTexture(document.createElement("canvas"));
         titleTexture.image.width = 600;
@@ -1489,6 +1559,29 @@ console.log(hello("[[world]]"));</textarea>
         );
         titleMesh.position.set(0.25, 1.92, 0.18);
         group.add(titleMesh);
+        function resizeWindow(nextWidth) {
+            const width = THREE.MathUtils.clamp(nextWidth, 3.8, 7.06);
+            if (Math.abs(width - contentWidth) < 0.01) return;
+            contentWidth = width;
+            body.geometry.dispose();
+            screen.geometry.dispose();
+            topbar.geometry.dispose();
+            codeMesh.geometry.dispose();
+            body.geometry = new THREE.ExtrudeGeometry(frameShape(width), {
+                depth: 0.035,
+                bevelEnabled: true,
+                curveSegments: 48,
+                bevelSegments: 6,
+                bevelSize: 0.018,
+                bevelThickness: 0.018,
+            });
+            screen.geometry = new THREE.ShapeGeometry(roundedShape(width, 4.36, 0.2), 48);
+            topbar.geometry = new THREE.ShapeGeometry(titlebarShape(width, 0.42, 0.2), 48);
+            codeMesh.geometry = new THREE.PlaneGeometry(width, contentHeight);
+            trafficLights.forEach(
+                (dot, index) => (dot.position.x = -width / 2 + 0.41 + index * 0.24),
+            );
+        }
         const popGroup = new THREE.Group();
         group.add(popGroup);
         function disposePops() {
@@ -1660,8 +1753,16 @@ console.log(hello("[[world]]"));</textarea>
             ctx.textBaseline = "alphabetic";
             disposePops();
             const cleanCode = code.replace(/\[\[(.*?)\]\]/g, "$1"),
-                segments = highlightedSegments(cleanCode, language),
                 cleanLines = cleanCode.split("\n"),
+                widestLine = Math.max(...cleanLines.map((line) => ctx.measureText(line).width)),
+                logicalWidth = THREE.MathUtils.clamp(Math.ceil(widestLine + 212), 540, 1400);
+            ctx.font = `${fontSize}px ${editorFont}`;
+            ctx.textBaseline = "alphabetic";
+            resizeWindow((logicalWidth / 1400) * 7.06);
+            ctx.clearRect(0, 0, codeCanvas.width, codeCanvas.height);
+            ctx.fillStyle = theme.screen;
+            ctx.fillRect(0, 0, codeCanvas.width, codeCanvas.height);
+            const segments = highlightedSegments(cleanCode, language),
                 lineBaseline = 76 + fontSize * 0.36,
                 lineHeight = fontSize * (57 / 31);
             const markedSpans = [];
@@ -1744,6 +1845,7 @@ console.log(hello("[[world]]"));</textarea>
             front: [0, 1.2, 11.2],
             left: [-6, 2.8, 9.4],
             right: [6, 2.8, 9.4],
+            monolith: [0, -4.6, 8.8],
         };
         let activeCamera = "front";
         const lightingModes = {
@@ -1827,24 +1929,20 @@ console.log(hello("[[world]]"));</textarea>
             galleryFloor.visible = activeBackground === "gallery";
         }
         function applyCamera() {
-            if (activeCamera === "free") {
-                controls.enabled = true;
-                controls.update();
-                gizmo.classList.add("active");
-                zoomIndicator.classList.add("active");
-                renderer.domElement.classList.add("active");
-                renderGizmo();
-                updateZoomIndicator();
-                return;
-            }
-            controls.enabled = false;
-            gizmo.classList.remove("active");
-            zoomIndicator.classList.remove("active");
-            renderer.domElement.classList.remove("active");
-            const [x, y, z] = cameraPresets[activeCamera];
-            camera.position.set(x, y, z);
+            const [x, y, z] = cameraPresets[activeCamera],
+                aspect = Math.max(preview.clientWidth / Math.max(preview.clientHeight, 1), 0.1),
+                halfFov = THREE.MathUtils.degToRad(camera.fov / 2),
+                frontDistance =
+                    Math.max(
+                        4.6 / 2 / Math.tan(halfFov),
+                        (contentWidth + 0.24) / 2 / (Math.tan(halfFov) * aspect),
+                    ) / 0.84;
+            camera.position.set(x, y, activeCamera === "front" ? frontDistance : z);
             camera.lookAt(0, 0.05, 0);
             controls.target.set(0, 0.05, 0);
+            controls.update();
+            renderGizmo();
+            updateZoomIndicator();
         }
         let previewSize = "";
         function snapshot() {
@@ -1974,6 +2072,17 @@ console.log(hello("[[world]]"));</textarea>
                     item.setAttribute("aria-pressed", isActive);
                 });
                 scheduleUpdate();
+            }),
+        );
+        document.querySelectorAll(".overlay-button").forEach((button) =>
+            button.addEventListener("click", () => {
+                const visible = button.dataset.overlays === "show";
+                preview.classList.toggle("overlays-hidden", !visible);
+                document.querySelectorAll(".overlay-button").forEach((item) => {
+                    const isActive = item === button;
+                    item.classList.toggle("active", isActive);
+                    item.setAttribute("aria-pressed", isActive);
+                });
             }),
         );
         new ResizeObserver(scheduleUpdate).observe(preview);
