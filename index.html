@@ -148,6 +148,8 @@
         }
         aside {
             align-self: stretch;
+            display: flex;
+            flex-direction: column;
             height: 100%;
             padding: 18px;
             border: 1px solid var(--line);
@@ -155,6 +157,70 @@
             background: rgba(18, 25, 40, 0.8);
             box-shadow: 0 16px 35px rgba(0, 0, 0, 0.18);
             backdrop-filter: blur(14px);
+        }
+        .accordion {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .accordion-section {
+            display: flex;
+            flex: 0 0 auto;
+            min-height: 0;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            background: rgba(8, 13, 23, 0.35);
+        }
+        .accordion-section.open {
+            flex: 1 1 auto;
+        }
+        .accordion-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            min-height: 39px;
+            padding: 0 12px;
+            border: 0;
+            border-radius: 0;
+            color: #fff;
+            background: transparent;
+            box-shadow: none;
+            text-align: left;
+        }
+        .accordion-trigger:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.055);
+        }
+        .accordion-trigger svg {
+            width: 15px;
+            height: 15px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            transition: transform 0.18s ease;
+        }
+        .accordion-section.open .accordion-trigger svg {
+            transform: rotate(180deg);
+        }
+        .accordion-panel {
+            display: none;
+            min-height: 0;
+            padding: 0 12px 12px;
+            overflow: auto;
+        }
+        .accordion-section.open .accordion-panel {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+        }
+        .accordion-panel .snippet-field {
+            flex: 1;
+            min-height: 150px;
         }
         label {
             display: block;
@@ -234,7 +300,7 @@
             box-shadow: 0 0 0 3px rgba(92, 116, 227, 0.15);
         }
         textarea {
-            min-height: clamp(150px, 27vh, 230px);
+            min-height: 0;
             resize: none;
             font:
                 12px / 1.55 var(--editor-font, "Fira Code"),
@@ -248,19 +314,30 @@
         .field {
             margin-bottom: 15px;
         }
+        .snippet-field {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            min-height: 0;
+        }
+        .snippet-field textarea {
+            flex: 1;
+        }
         .split {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
         }
         .camera-options,
-        .lighting-options {
+        .lighting-options,
+        .background-options {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 7px;
         }
         .camera-button,
-        .lighting-button {
+        .lighting-button,
+        .background-button {
             display: grid;
             place-items: center;
             aspect-ratio: 1.25;
@@ -272,19 +349,22 @@
             box-shadow: none;
         }
         .camera-button:hover,
-        .lighting-button:hover {
+        .lighting-button:hover,
+        .background-button:hover {
             color: #fff;
             background: #172238;
         }
         .camera-button.active,
-        .lighting-button.active {
+        .lighting-button.active,
+        .background-button.active {
             color: #091019;
             background: #8bf0be;
             border-color: #8bf0be;
             box-shadow: 0 5px 13px rgba(88, 229, 162, 0.16);
         }
         .camera-button svg,
-        .lighting-button svg {
+        .lighting-button svg,
+        .background-button svg {
             width: 20px;
             height: 20px;
             stroke: currentColor;
@@ -326,9 +406,15 @@
             background: #b2f7d1;
         }
         #download {
-            color: #dbe6fa;
-            background: #202a3d;
+            margin-top: auto;
+            border: 1px solid #8bf0be;
+            color: #8bf0be;
+            background: transparent;
             box-shadow: none;
+        }
+        #download:hover {
+            color: #091019;
+            background: #8bf0be;
         }
         .hint {
             margin: 13px 0 0;
@@ -354,242 +440,398 @@
                     ></div>
                 </div>
                 <aside>
-                    <div class="field">
-                        <label for="title">Window title</label>
-                        <input id="title" value="hello.ts" maxlength="28">
-                    </div>
-                    <div class="field split">
-                        <div>
-                            <label for="language">Language</label
-                            ><select id="language">
-                                <option>TypeScript</option>
-                                <option>JavaScript</option>
-                                <option>Python</option>
-                                <option>CSS</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="theme">Theme</label
-                            ><select id="theme">
-                                <option value="midnight">Midnight</option>
-                                <option value="monokai">Monokai</option>
-                                <option value="darcula">Darcula</option>
-                                <option value="solarized">Solarized</option>
-                                <option value="dracula">Dracula</option>
-                                <option value="nord">Nord</option>
-                                <option value="contrastLight">High Contrast Light</option>
-                                <option value="contrastDark">High Contrast Dark</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <label for="font">IDE font</label
-                        ><select id="font">
-                            <option>Fira Code</option>
-                            <option>Reddit Mono</option>
-                            <option>JetBrains Mono</option>
-                            <option>IBM Plex Mono</option>
-                            <option>Source Code Pro</option>
-                            <option>Roboto Mono</option>
-                        </select>
-                    </div>
-                    <div class="field">
-                        <label class="range-label" for="font-size"
-                            ><span>IDE font size</span
-                            ><output id="font-size-value">31 px</output></label
-                        ><input id="font-size" type="range" min="20" max="42" step="1" value="31">
-                    </div>
-                    <div class="field">
-                        <label>Camera</label>
-                        <div class="camera-options" role="group" aria-label="Camera angle">
-                            <button
-                                class="camera-button active"
-                                type="button"
-                                data-camera="front"
-                                aria-label="Front view"
-                                aria-pressed="true"
-                                title="Front view"
-                            >
-                                <svg viewBox="0 0 24 24">
-                                    <rect x="4" y="5" width="16" height="12" rx="2" />
-                                    <path d="M8 20h8M12 17v3" />
+                    <div class="accordion">
+                        <section class="accordion-section open">
+                            <button class="accordion-trigger" type="button" aria-expanded="true">
+                                IDE<svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="m6 9 6 6 6-6" />
                                 </svg>
                             </button>
-                            <button
-                                class="camera-button"
-                                type="button"
-                                data-camera="studio"
-                                aria-label="Studio angle"
-                                aria-pressed="false"
-                                title="Studio angle"
-                            >
-                                <svg viewBox="0 0 24 24">
-                                    <path d="m3 8 9-4 9 4-9 4zM3 8v8l9 4 9-4V8M12 12v8" />
-                                </svg>
-                            </button>
-                            <button
-                                class="camera-button"
-                                type="button"
-                                data-camera="left"
-                                aria-label="Left angle"
-                                aria-pressed="false"
-                                title="Left angle"
-                            >
-                                <svg viewBox="0 0 24 24">
-                                    <path d="m4 8 12-4 4 3v10L8 21 4 18zM4 8l4 3v10M8 11l12-4" />
-                                </svg>
-                            </button>
-                            <button
-                                class="camera-button"
-                                type="button"
-                                data-camera="right"
-                                aria-label="Right angle"
-                                aria-pressed="false"
-                                title="Right angle"
-                            >
-                                <svg viewBox="0 0 24 24">
-                                    <path d="m20 8-12-4-4 3v10l12 4 4-3zM20 8l-4 3v10M16 11 4 7" />
-                                </svg>
-                            </button>
-                            <button
-                                class="camera-button free-view"
-                                type="button"
-                                data-camera="free"
-                                aria-label="Free view: drag preview to rotate"
-                                aria-pressed="false"
-                                title="Free view"
-                            >
-                                <svg viewBox="0 0 24 24">
-                                    <path class="axis-x" d="m12 13 7 4" />
-                                    <circle class="axis-x" cx="19" cy="17" r="2.1" />
-                                    <path class="axis-y" d="M12 13V5" />
-                                    <circle class="axis-y" cx="12" cy="5" r="2.1" />
-                                    <path class="axis-z" d="m12 13-7 4" />
-                                    <circle class="axis-z" cx="5" cy="17" r="2.1" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <label>Lighting</label>
-                        <div class="lighting-options" role="group" aria-label="Scene lighting">
-                            <button
-                                class="lighting-button active"
-                                type="button"
-                                data-lighting="studio"
-                                aria-label="Studio lighting"
-                                aria-pressed="true"
-                                title="Studio"
-                            >
-                                <svg viewBox="0 0 24 24">
-                                    <circle cx="12" cy="12" r="3" />
-                                    <path
-                                        d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"
-                                    />
-                                </svg>
-                            </button>
-                            <button
-                                class="lighting-button"
-                                type="button"
-                                data-lighting="soft"
-                                aria-label="Soft lighting"
-                                aria-pressed="false"
-                                title="Soft"
-                            >
-                                <svg viewBox="0 0 24 24">
-                                    <path
-                                        d="M6 17h11a4 4 0 0 0 .4-8A5.5 5.5 0 0 0 7 10.5 3.3 3.3 0 0 0 6 17z"
-                                    />
-                                </svg>
-                            </button>
-                            <button
-                                class="lighting-button"
-                                type="button"
-                                data-lighting="sunset"
-                                aria-label="Sunset lighting"
-                                aria-pressed="false"
-                                title="Sunset"
-                            >
-                                <svg viewBox="0 0 24 24">
-                                    <path
-                                        d="M3 18h18M6 14a6 6 0 0 1 12 0M12 4v3M5 7l2 2M19 7l-2 2"
-                                    />
-                                </svg>
-                            </button>
-                            <button
-                                class="lighting-button"
-                                type="button"
-                                data-lighting="noir"
-                                aria-label="Noir lighting"
-                                aria-pressed="false"
-                                title="Noir"
-                            >
-                                <svg viewBox="0 0 24 24">
-                                    <path d="M16 4a7 7 0 1 0 4 12A7 7 0 0 1 16 4z" />
-                                </svg>
-                            </button>
-                            <button
-                                class="lighting-button"
-                                type="button"
-                                data-lighting="neon"
-                                aria-label="Neon lighting"
-                                aria-pressed="false"
-                                title="Neon"
-                            >
-                                <svg viewBox="0 0 24 24">
-                                    <path d="m13 2-9 12h7l-1 8 10-13h-7z" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <div class="range-label">
-                            <label for="pop-height">3D text height</label
-                            ><span class="range-value"
-                                ><output id="pop-height-value">0.040</output
-                                ><button
-                                    id="reset-pop-height"
-                                    class="reset-height"
-                                    type="button"
-                                    aria-label="Restore default 3D text height"
-                                    title="Restore default height"
-                                >
-                                    <svg
-                                        class="restore-icon"
-                                        viewBox="0 0 16 16"
-                                        aria-hidden="true"
+                            <div class="accordion-panel">
+                                <div class="field">
+                                    <label for="title">Window title</label>
+                                    <input id="title" value="hello.ts" maxlength="28">
+                                </div>
+                                <div class="field split">
+                                    <div>
+                                        <label for="language">Language</label
+                                        ><select id="language">
+                                            <option>TypeScript</option>
+                                            <option>JavaScript</option>
+                                            <option>Python</option>
+                                            <option>CSS</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="theme">Theme</label
+                                        ><select id="theme">
+                                            <option value="midnight">Midnight</option>
+                                            <option value="monokai">Monokai</option>
+                                            <option value="darcula">Darcula</option>
+                                            <option value="solarized">Solarized</option>
+                                            <option value="dracula">Dracula</option>
+                                            <option value="nord">Nord</option>
+                                            <option value="contrastLight">
+                                                High Contrast Light
+                                            </option>
+                                            <option value="contrastDark">High Contrast Dark</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label for="font">IDE font</label
+                                    ><select id="font">
+                                        <option>Fira Code</option>
+                                        <option>Reddit Mono</option>
+                                        <option>JetBrains Mono</option>
+                                        <option>IBM Plex Mono</option>
+                                        <option>Source Code Pro</option>
+                                        <option>Roboto Mono</option>
+                                    </select>
+                                </div>
+                                <div class="field">
+                                    <div class="range-label">
+                                        <label for="font-size">IDE font size</label
+                                        ><span class="range-value"
+                                            ><output id="font-size-value">31 px</output
+                                            ><button
+                                                id="reset-font-size"
+                                                class="reset-height"
+                                                type="button"
+                                                aria-label="Restore default IDE font size"
+                                                title="Restore default size"
+                                            >
+                                                <svg
+                                                    class="restore-icon"
+                                                    viewBox="0 0 16 16"
+                                                    aria-hidden="true"
+                                                >
+                                                    <path
+                                                        fill-rule="evenodd"
+                                                        d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2z"
+                                                    />
+                                                    <path
+                                                        d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466"
+                                                    />
+                                                </svg>
+                                            </button></span
+                                        >
+                                    </div>
+                                    <input
+                                        id="font-size"
+                                        type="range"
+                                        min="20"
+                                        max="42"
+                                        step="1"
+                                        value="31"
                                     >
-                                        <path
-                                            fill-rule="evenodd"
-                                            d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2z"
-                                        />
-                                        <path
-                                            d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466"
-                                        />
-                                    </svg>
-                                </button></span
-                            >
-                        </div>
-                        <input
-                            id="pop-height"
-                            type="range"
-                            min="0"
-                            max="0.3"
-                            step="0.001"
-                            value="0.040"
-                        >
-                    </div>
-                    <div class="field">
-                        <label for="code">Snippet</label>
-                        <p class="hint code-hint">
-                            Wrap text in <code>[[double brackets]]</code> to render it as a flush 3D
-                            layer.
-                        </p>
-                        <textarea id="code" spellcheck="false">const hello = (name: string) => {
+                                </div>
+                            </div>
+                        </section>
+                        <section class="accordion-section">
+                            <button class="accordion-trigger" type="button" aria-expanded="false">
+                                Snippet<svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="m6 9 6 6 6-6" />
+                                </svg>
+                            </button>
+                            <div class="accordion-panel">
+                                <div class="field snippet-field">
+                                    <label for="code">Snippet</label>
+                                    <p class="hint code-hint">
+                                        Wrap text in <code>[[double brackets]]</code> to render it
+                                        as a flush 3D layer.
+                                    </p>
+                                    <textarea
+                                        id="code"
+                                        spellcheck="false"
+                                    >const hello = (name: string) => {
   return `Hello, ${name}.`;
 };
 
 console.log(hello("[[world]]"));</textarea>
+                                </div>
+                                <div class="field">
+                                    <div class="range-label">
+                                        <label for="pop-height">3D text height</label
+                                        ><span class="range-value"
+                                            ><output id="pop-height-value">0.040</output
+                                            ><button
+                                                id="reset-pop-height"
+                                                class="reset-height"
+                                                type="button"
+                                                aria-label="Restore default 3D text height"
+                                                title="Restore default height"
+                                            >
+                                                <svg
+                                                    class="restore-icon"
+                                                    viewBox="0 0 16 16"
+                                                    aria-hidden="true"
+                                                >
+                                                    <path
+                                                        fill-rule="evenodd"
+                                                        d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2z"
+                                                    />
+                                                    <path
+                                                        d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466"
+                                                    />
+                                                </svg>
+                                            </button></span
+                                        >
+                                    </div>
+                                    <input
+                                        id="pop-height"
+                                        type="range"
+                                        min="0"
+                                        max="0.3"
+                                        step="0.001"
+                                        value="0.040"
+                                    >
+                                </div>
+                            </div>
+                        </section>
+                        <section class="accordion-section">
+                            <button class="accordion-trigger" type="button" aria-expanded="false">
+                                Scene<svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="m6 9 6 6 6-6" />
+                                </svg>
+                            </button>
+                            <div class="accordion-panel">
+                                <div class="field">
+                                    <label>Camera</label>
+                                    <div
+                                        class="camera-options"
+                                        role="group"
+                                        aria-label="Camera angle"
+                                    >
+                                        <button
+                                            class="camera-button active"
+                                            type="button"
+                                            data-camera="front"
+                                            aria-label="Front view"
+                                            aria-pressed="true"
+                                            title="Front view"
+                                        >
+                                            <svg viewBox="0 0 24 24">
+                                                <rect x="4" y="5" width="16" height="12" rx="2" />
+                                                <path d="M8 20h8M12 17v3" />
+                                            </svg>
+                                        </button>
+                                        <button
+                                            class="camera-button"
+                                            type="button"
+                                            data-camera="studio"
+                                            aria-label="Studio angle"
+                                            aria-pressed="false"
+                                            title="Studio angle"
+                                        >
+                                            <svg viewBox="0 0 24 24">
+                                                <path
+                                                    d="m3 8 9-4 9 4-9 4zM3 8v8l9 4 9-4V8M12 12v8"
+                                                />
+                                            </svg>
+                                        </button>
+                                        <button
+                                            class="camera-button"
+                                            type="button"
+                                            data-camera="left"
+                                            aria-label="Left angle"
+                                            aria-pressed="false"
+                                            title="Left angle"
+                                        >
+                                            <svg viewBox="0 0 24 24">
+                                                <path
+                                                    d="m4 8 12-4 4 3v10L8 21 4 18zM4 8l4 3v10M8 11l12-4"
+                                                />
+                                            </svg>
+                                        </button>
+                                        <button
+                                            class="camera-button"
+                                            type="button"
+                                            data-camera="right"
+                                            aria-label="Right angle"
+                                            aria-pressed="false"
+                                            title="Right angle"
+                                        >
+                                            <svg viewBox="0 0 24 24">
+                                                <path
+                                                    d="m20 8-12-4-4 3v10l12 4 4-3zM20 8l-4 3v10M16 11 4 7"
+                                                />
+                                            </svg>
+                                        </button>
+                                        <button
+                                            class="camera-button free-view"
+                                            type="button"
+                                            data-camera="free"
+                                            aria-label="Free view: drag preview to rotate"
+                                            aria-pressed="false"
+                                            title="Free view"
+                                        >
+                                            <svg viewBox="0 0 24 24">
+                                                <path class="axis-x" d="m12 13 7 4" />
+                                                <circle class="axis-x" cx="19" cy="17" r="2.1" />
+                                                <path class="axis-y" d="M12 13V5" />
+                                                <circle class="axis-y" cx="12" cy="5" r="2.1" />
+                                                <path class="axis-z" d="m12 13-7 4" />
+                                                <circle class="axis-z" cx="5" cy="17" r="2.1" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label>Lighting</label>
+                                    <div
+                                        class="lighting-options"
+                                        role="group"
+                                        aria-label="Scene lighting"
+                                    >
+                                        <button
+                                            class="lighting-button active"
+                                            type="button"
+                                            data-lighting="studio"
+                                            aria-label="Studio lighting"
+                                            aria-pressed="true"
+                                            title="Studio"
+                                        >
+                                            <svg viewBox="0 0 24 24">
+                                                <circle cx="12" cy="12" r="3" />
+                                                <path
+                                                    d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"
+                                                />
+                                            </svg>
+                                        </button>
+                                        <button
+                                            class="lighting-button"
+                                            type="button"
+                                            data-lighting="soft"
+                                            aria-label="Soft lighting"
+                                            aria-pressed="false"
+                                            title="Soft"
+                                        >
+                                            <svg viewBox="0 0 24 24">
+                                                <path
+                                                    d="M6 17h11a4 4 0 0 0 .4-8A5.5 5.5 0 0 0 7 10.5 3.3 3.3 0 0 0 6 17z"
+                                                />
+                                            </svg>
+                                        </button>
+                                        <button
+                                            class="lighting-button"
+                                            type="button"
+                                            data-lighting="sunset"
+                                            aria-label="Sunset lighting"
+                                            aria-pressed="false"
+                                            title="Sunset"
+                                        >
+                                            <svg viewBox="0 0 24 24">
+                                                <path
+                                                    d="M3 18h18M6 14a6 6 0 0 1 12 0M12 4v3M5 7l2 2M19 7l-2 2"
+                                                />
+                                            </svg>
+                                        </button>
+                                        <button
+                                            class="lighting-button"
+                                            type="button"
+                                            data-lighting="noir"
+                                            aria-label="Noir lighting"
+                                            aria-pressed="false"
+                                            title="Noir"
+                                        >
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M16 4a7 7 0 1 0 4 12A7 7 0 0 1 16 4z" />
+                                            </svg>
+                                        </button>
+                                        <button
+                                            class="lighting-button"
+                                            type="button"
+                                            data-lighting="neon"
+                                            aria-label="Neon lighting"
+                                            aria-pressed="false"
+                                            title="Neon"
+                                        >
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="m13 2-9 12h7l-1 8 10-13h-7z" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label>Background</label>
+                                    <div
+                                        class="background-options"
+                                        role="group"
+                                        aria-label="Scene background"
+                                    >
+                                        <button
+                                            class="background-button active"
+                                            type="button"
+                                            data-background="midnight"
+                                            aria-label="Midnight background"
+                                            aria-pressed="true"
+                                            title="Midnight"
+                                        >
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M4 18a8 8 0 0 1 12-10 6 6 0 1 0-12 10z" />
+                                                <path
+                                                    d="m17 4 .6 1.4L19 6l-1.4.6L17 8l-.6-1.4L15 6l1.4-.6z"
+                                                />
+                                            </svg>
+                                        </button>
+                                        <button
+                                            class="background-button"
+                                            type="button"
+                                            data-background="dawn"
+                                            aria-label="Dawn background"
+                                            aria-pressed="false"
+                                            title="Dawn"
+                                        >
+                                            <svg viewBox="0 0 24 24">
+                                                <path
+                                                    d="M3 17h18M6 14a6 6 0 0 1 12 0M12 3v3M5 7l2 2M19 7l-2 2"
+                                                />
+                                            </svg>
+                                        </button>
+                                        <button
+                                            class="background-button"
+                                            type="button"
+                                            data-background="paper"
+                                            aria-label="Paper background"
+                                            aria-pressed="false"
+                                            title="Paper"
+                                        >
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M6 3h9l3 3v15H6zM15 3v4h4" />
+                                                <path d="M9 12h6M9 16h6" />
+                                            </svg>
+                                        </button>
+                                        <button
+                                            class="background-button"
+                                            type="button"
+                                            data-background="forest"
+                                            aria-label="Forest background"
+                                            aria-pressed="false"
+                                            title="Forest"
+                                        >
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="m12 3 7 9h-4l5 7H4l5-7H5z" />
+                                            </svg>
+                                        </button>
+                                        <button
+                                            class="background-button"
+                                            type="button"
+                                            data-background="violet"
+                                            aria-label="Violet background"
+                                            aria-pressed="false"
+                                            title="Violet"
+                                        >
+                                            <svg viewBox="0 0 24 24">
+                                                <path
+                                                    d="M12 3c3 4.2 6 6.6 6 10a6 6 0 1 1-12 0c0-3.4 3-5.8 6-10z"
+                                                />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
                     </div>
                     <button id="download">Download PNG</button>
                 </aside>
@@ -1024,7 +1266,7 @@ console.log(hello("[[world]]"));</textarea>
         const outlineFonts = new Map(),
             outlineSources = {
                 "Fira Code":
-                    "https://cdn.jsdelivr.net/gh/tonsky/FiraCode@master/distr/ttf/FiraCode-Regular.ttf",
+                    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/firacode/FiraCode%5Bwght%5D.ttf",
                 "Reddit Mono":
                     "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/redditmono/RedditMono%5Bwght%5D.ttf",
                 "JetBrains Mono":
@@ -1155,7 +1397,6 @@ console.log(hello("[[world]]"));</textarea>
                 outlineFont = outlineFonts.get(fontName),
                 editorFont = `"${fontName}", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace`;
             document.documentElement.style.setProperty("--editor-font", `"${fontName}"`);
-            scene.background.set(theme.bg);
             bodyMaterial.color.set(theme.body);
             screenMaterial.color.set(theme.screen);
             barMaterial.color.set(theme.bar);
@@ -1284,6 +1525,14 @@ console.log(hello("[[world]]"));</textarea>
             },
         };
         let activeLighting = "studio";
+        const backgroundModes = {
+            midnight: "#101624",
+            dawn: "#f6c78e",
+            paper: "#eef2f3",
+            forest: "#173c35",
+            violet: "#372059",
+        };
+        let activeBackground = "midnight";
         function applyLighting() {
             const mode = lightingModes[activeLighting];
             ambient.color.set(mode.sky);
@@ -1294,6 +1543,9 @@ console.log(hello("[[world]]"));</textarea>
             key.position.set(...mode.keyPosition);
             rim.color.set(mode.rim);
             rim.intensity = mode.rimIntensity;
+        }
+        function applyBackground() {
+            scene.background.set(backgroundModes[activeBackground]);
         }
         function applyCamera() {
             if (activeCamera === "free") {
@@ -1327,6 +1579,7 @@ console.log(hello("[[world]]"));</textarea>
         function update() {
             draw();
             applyLighting();
+            applyBackground();
             applyCamera();
             snapshot();
         }
@@ -1360,6 +1613,12 @@ console.log(hello("[[world]]"));</textarea>
                 (event) =>
                     (document.querySelector("#font-size-value").value = `${event.target.value} px`),
             );
+        document.querySelector("#reset-font-size").addEventListener("click", () => {
+            const size = document.querySelector("#font-size");
+            size.value = "31";
+            document.querySelector("#font-size-value").value = "31 px";
+            scheduleUpdate();
+        });
         document
             .querySelector("#font")
             .addEventListener("change", () =>
@@ -1388,6 +1647,27 @@ console.log(hello("[[world]]"));</textarea>
                     item.setAttribute("aria-pressed", isActive);
                 });
                 scheduleUpdate();
+            }),
+        );
+        document.querySelectorAll(".background-button").forEach((button) =>
+            button.addEventListener("click", () => {
+                activeBackground = button.dataset.background;
+                document.querySelectorAll(".background-button").forEach((item) => {
+                    const isActive = item === button;
+                    item.classList.toggle("active", isActive);
+                    item.setAttribute("aria-pressed", isActive);
+                });
+                scheduleUpdate();
+            }),
+        );
+        document.querySelectorAll(".accordion-trigger").forEach((trigger) =>
+            trigger.addEventListener("click", () => {
+                const section = trigger.closest(".accordion-section");
+                document.querySelectorAll(".accordion-section").forEach((item) => {
+                    const isOpen = item === section;
+                    item.classList.toggle("open", isOpen);
+                    item.querySelector(".accordion-trigger").setAttribute("aria-expanded", isOpen);
+                });
             }),
         );
         document.querySelector("#download").addEventListener("click", () => {
