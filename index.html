@@ -71,7 +71,7 @@
             color: var(--ink);
         }
         main {
-            width: min(1280px, calc(100% - 40px));
+            width: min(1540px, calc(100% - 48px));
             height: 100vh;
             margin: auto;
             padding: 24px 0;
@@ -90,11 +90,11 @@
         }
         .workspace {
             display: grid;
-            grid-template-columns: minmax(0, 1fr) 300px;
+            grid-template-columns: minmax(0, 1fr) 286px;
             grid-template-rows: minmax(0, 1fr);
             height: 100%;
             min-height: 0;
-            gap: 22px;
+            gap: 18px;
         }
         .preview {
             min-height: 0;
@@ -117,14 +117,17 @@
             height: 100%;
             object-fit: cover;
         }
+        #snapshot {
+            visibility: hidden;
+        }
         .preview.free-view #snapshot {
             visibility: hidden;
         }
         .live-canvas {
             z-index: 1;
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
         }
         .live-canvas.active {
             opacity: 1;
@@ -343,6 +346,39 @@
         select:focus {
             border-color: #6b82ee;
             box-shadow: 0 0 0 3px rgba(92, 116, 227, 0.15);
+        }
+        .cycle-control {
+            display: grid;
+            grid-template-columns: 32px minmax(0, 1fr) 32px;
+            align-items: stretch;
+            gap: 6px;
+        }
+        .cycle-control select {
+            min-width: 0;
+        }
+        .cycle-button {
+            display: grid;
+            place-items: center;
+            width: 32px;
+            padding: 0;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 9px;
+            color: #aebbd0;
+            background: #0d1422;
+            box-shadow: none;
+        }
+        .cycle-button:hover {
+            color: #fff;
+            background: #172238;
+        }
+        .cycle-button svg {
+            width: 15px;
+            height: 15px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
         textarea {
             height: 240px;
@@ -672,28 +708,74 @@
                                     </div>
                                 </div>
                                 <div class="field">
-                                    <label for="theme">Theme</label
-                                    ><select id="theme">
-                                        <option value="midnight">Midnight</option>
-                                        <option value="monokai">Monokai</option>
-                                        <option value="darcula">Darcula</option>
-                                        <option value="solarized">Solarized</option>
-                                        <option value="dracula">Dracula</option>
-                                        <option value="nord">Nord</option>
-                                        <option value="contrastLight">High Contrast Light</option>
-                                        <option value="contrastDark">High Contrast Dark</option>
-                                    </select>
+                                    <label for="theme">Theme</label>
+                                    <div class="cycle-control">
+                                        <button
+                                            class="cycle-button"
+                                            type="button"
+                                            data-cycle-target="theme"
+                                            data-cycle-step="-1"
+                                            aria-label="Previous theme"
+                                        >
+                                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                                <path d="m15 18-6-6 6-6" />
+                                            </svg>
+                                        </button><select id="theme">
+                                            <option value="midnight">Midnight</option>
+                                            <option value="monokai">Monokai</option>
+                                            <option value="darcula">Darcula</option>
+                                            <option value="solarized">Solarized</option>
+                                            <option value="dracula">Dracula</option>
+                                            <option value="nord">Nord</option>
+                                            <option value="contrastLight">
+                                                High Contrast Light
+                                            </option>
+                                            <option value="contrastDark">High Contrast Dark</option>
+                                        </select><button
+                                            class="cycle-button"
+                                            type="button"
+                                            data-cycle-target="theme"
+                                            data-cycle-step="1"
+                                            aria-label="Next theme"
+                                        >
+                                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                                <path d="m9 18 6-6-6-6" />
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="field">
-                                    <label for="font">IDE font</label
-                                    ><select id="font">
-                                        <option>Fira Code</option>
-                                        <option>Reddit Mono</option>
-                                        <option>JetBrains Mono</option>
-                                        <option>IBM Plex Mono</option>
-                                        <option>Source Code Pro</option>
-                                        <option>Roboto Mono</option>
-                                    </select>
+                                    <label for="font">IDE font</label>
+                                    <div class="cycle-control">
+                                        <button
+                                            class="cycle-button"
+                                            type="button"
+                                            data-cycle-target="font"
+                                            data-cycle-step="-1"
+                                            aria-label="Previous IDE font"
+                                        >
+                                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                                <path d="m15 18-6-6 6-6" />
+                                            </svg>
+                                        </button><select id="font">
+                                            <option>Fira Code</option>
+                                            <option>Reddit Mono</option>
+                                            <option>JetBrains Mono</option>
+                                            <option>IBM Plex Mono</option>
+                                            <option>Source Code Pro</option>
+                                            <option>Roboto Mono</option>
+                                        </select><button
+                                            class="cycle-button"
+                                            type="button"
+                                            data-cycle-target="font"
+                                            data-cycle-step="1"
+                                            aria-label="Next IDE font"
+                                        >
+                                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                                <path d="m9 18 6-6-6-6" />
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="field">
                                     <div class="range-label">
@@ -1302,7 +1384,6 @@ console.log(hello("[[world]]"));</textarea>
         renderer.domElement.addEventListener(
             "wheel",
             (event) => {
-                if (activeCamera !== "free") return;
                 event.preventDefault();
                 const offset = camera.position.clone().sub(controls.target),
                     distance = THREE.MathUtils.clamp(
@@ -1461,9 +1542,9 @@ console.log(hello("[[world]]"));</textarea>
             s.quadraticCurveTo(x, y, x, y + r);
             return s;
         }
-        function frameShape(w) {
-            const frame = roundedShape(w + 0.24, 4.6, 0.28),
-                hole = new THREE.Path(roundedShape(w, 4.36, 0.2).getPoints(48).reverse());
+        function frameShape(w, h) {
+            const frame = roundedShape(w + 0.24, h + 0.24, 0.28),
+                hole = new THREE.Path(roundedShape(w, h, 0.2).getPoints(48).reverse());
             frame.holes.push(hole);
             return frame;
         }
@@ -1473,7 +1554,7 @@ console.log(hello("[[world]]"));</textarea>
                 roughness: 0.34,
             }),
             body = new THREE.Mesh(
-                new THREE.ExtrudeGeometry(frameShape(7.06), {
+                new THREE.ExtrudeGeometry(frameShape(7.06, 4.36), {
                     depth: 0.035,
                     bevelEnabled: true,
                     curveSegments: 48,
@@ -1511,15 +1592,19 @@ console.log(hello("[[world]]"));</textarea>
         topbar.position.set(0, 1.95, 0.161);
         topbar.receiveShadow = true;
         group.add(topbar);
-        let contentWidth = 7.06;
-        const contentHeight = 3.92,
-            contentTop = 1.74,
+        const worldUnitsPerPixel = 0.0048,
+            codeTextureScale = Math.min(3, Math.max(2, devicePixelRatio || 1)),
             codeCanvas = document.createElement("canvas"),
             ctx = codeCanvas.getContext("2d"),
             metricsCanvas = document.createElement("canvas"),
             metrics = metricsCanvas.getContext("2d");
-        codeCanvas.width = 1400;
-        codeCanvas.height = 778;
+        let contentWidth = 7.06,
+            contentHeight = 3.92,
+            titlebarHeight = 0.42,
+            innerHeight = contentHeight + titlebarHeight,
+            contentTop = innerHeight / 2 - titlebarHeight;
+        codeCanvas.width = Math.round((contentWidth / worldUnitsPerPixel) * codeTextureScale);
+        codeCanvas.height = Math.round((contentHeight / worldUnitsPerPixel) * codeTextureScale);
         const codeTexture = new THREE.CanvasTexture(codeCanvas);
         codeTexture.colorSpace = THREE.SRGBColorSpace;
         codeTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
@@ -1559,15 +1644,27 @@ console.log(hello("[[world]]"));</textarea>
         );
         titleMesh.position.set(0.25, 1.92, 0.18);
         group.add(titleMesh);
-        function resizeWindow(nextWidth) {
-            const width = THREE.MathUtils.clamp(nextWidth, 3.8, 7.06);
-            if (Math.abs(width - contentWidth) < 0.01) return;
+        function resizeWindow(nextWidth, nextContentHeight, nextTitlebarHeight) {
+            const width = THREE.MathUtils.clamp(nextWidth, 3.5, 12),
+                height = THREE.MathUtils.clamp(nextContentHeight, 1.5, 7.5),
+                barHeight = THREE.MathUtils.clamp(nextTitlebarHeight, 0.28, 0.62),
+                nextInnerHeight = height + barHeight;
+            if (
+                Math.abs(width - contentWidth) < 0.01 &&
+                Math.abs(height - contentHeight) < 0.01 &&
+                Math.abs(barHeight - titlebarHeight) < 0.01
+            )
+                return;
             contentWidth = width;
+            contentHeight = height;
+            titlebarHeight = barHeight;
+            innerHeight = nextInnerHeight;
+            contentTop = innerHeight / 2 - titlebarHeight;
             body.geometry.dispose();
             screen.geometry.dispose();
             topbar.geometry.dispose();
             codeMesh.geometry.dispose();
-            body.geometry = new THREE.ExtrudeGeometry(frameShape(width), {
+            body.geometry = new THREE.ExtrudeGeometry(frameShape(width, innerHeight), {
                 depth: 0.035,
                 bevelEnabled: true,
                 curveSegments: 48,
@@ -1575,12 +1672,38 @@ console.log(hello("[[world]]"));</textarea>
                 bevelSize: 0.018,
                 bevelThickness: 0.018,
             });
-            screen.geometry = new THREE.ShapeGeometry(roundedShape(width, 4.36, 0.2), 48);
-            topbar.geometry = new THREE.ShapeGeometry(titlebarShape(width, 0.42, 0.2), 48);
-            codeMesh.geometry = new THREE.PlaneGeometry(width, contentHeight);
-            trafficLights.forEach(
-                (dot, index) => (dot.position.x = -width / 2 + 0.41 + index * 0.24),
+            screen.geometry = new THREE.ShapeGeometry(roundedShape(width, innerHeight, 0.2), 48);
+            topbar.geometry = new THREE.ShapeGeometry(
+                titlebarShape(width, titlebarHeight, 0.2),
+                48,
             );
+            codeMesh.geometry = new THREE.PlaneGeometry(width, contentHeight);
+            codeMesh.position.y = -titlebarHeight / 2;
+            topbar.position.y = innerHeight / 2 - titlebarHeight / 2;
+            const lightRadius = titlebarHeight * 0.14,
+                lightDepth = lightRadius * 0.53,
+                lightSpacing = lightRadius * 3.1,
+                lightLeft = -width / 2 + titlebarHeight * 0.98;
+            trafficLights.forEach((dot, index) => {
+                dot.geometry.dispose();
+                dot.geometry = new THREE.CylinderGeometry(
+                    lightRadius,
+                    lightRadius,
+                    lightDepth,
+                    64,
+                    1,
+                    false,
+                );
+                dot.position.set(
+                    lightLeft + index * lightSpacing,
+                    topbar.position.y,
+                    topbar.position.z + lightDepth / 2 + 0.002,
+                );
+            });
+            titleMesh.geometry.dispose();
+            const titleWidth = THREE.MathUtils.clamp(width * 0.54, 1.6, 3.4);
+            titleMesh.geometry = new THREE.PlaneGeometry(titleWidth, titleWidth / 7.5);
+            titleMesh.position.set(0.25, topbar.position.y, topbar.position.z + 0.019);
         }
         const popGroup = new THREE.Group();
         group.add(popGroup);
@@ -1697,8 +1820,10 @@ console.log(hello("[[world]]"));</textarea>
                     bevelEnabled: false,
                     curveSegments: 12,
                 }),
-                pixelsToWorldX = contentWidth / codeCanvas.width,
-                pixelsToWorldY = contentHeight / codeCanvas.height,
+                canvasWidth = codeCanvas.width / codeTextureScale,
+                canvasHeight = codeCanvas.height / codeTextureScale,
+                pixelsToWorldX = contentWidth / canvasWidth,
+                pixelsToWorldY = contentHeight / canvasHeight,
                 outlineWidth = Math.max(font.getAdvanceWidth(text, fontSize), Number.EPSILON),
                 outlineHeight = Math.max(bounds.y2 - bounds.y1, Number.EPSILON),
                 scaleX = pixelsToWorldX * (glyphMetrics.width / outlineWidth),
@@ -1743,29 +1868,44 @@ console.log(hello("[[world]]"));</textarea>
             screenMaterial.color.set(theme.screen);
             barMaterial.color.set(theme.bar);
             const fontDeclaration = `${fontSize}px ${editorFont}`;
+            // Keep every layout read independent of the resized, DPR-scaled paint canvas.
             metrics.font = fontDeclaration;
             metrics.textBaseline = "alphabetic";
             const measure = (text) => metrics.measureText(text);
-            ctx.clearRect(0, 0, codeCanvas.width, codeCanvas.height);
-            ctx.fillStyle = theme.screen;
-            ctx.fillRect(0, 0, codeCanvas.width, codeCanvas.height);
-            ctx.font = fontDeclaration;
-            ctx.textBaseline = "alphabetic";
             disposePops();
             const cleanCode = code.replace(/\[\[(.*?)\]\]/g, "$1"),
                 cleanLines = cleanCode.split("\n"),
-                widestLine = Math.max(...cleanLines.map((line) => ctx.measureText(line).width)),
-                logicalWidth = THREE.MathUtils.clamp(Math.ceil(widestLine + 212), 540, 1400);
-            ctx.font = `${fontSize}px ${editorFont}`;
+                widestLine = Math.max(...cleanLines.map((line) => measure(line).width)),
+                lineHeight = fontSize * (57 / 31),
+                lineBaseline = Math.ceil(fontSize * 2.8),
+                codeStartX = Math.ceil(fontSize * 4.58),
+                lineNumberX = Math.ceil(fontSize * 1.45),
+                rightPadding = Math.ceil(fontSize * 2.3),
+                bottomPadding = Math.ceil(fontSize * 1.8),
+                logicalWidth = Math.ceil(codeStartX + widestLine + rightPadding),
+                logicalHeight = Math.ceil(
+                    lineBaseline +
+                        (cleanLines.length - 1) * lineHeight +
+                        fontSize * 0.35 +
+                        bottomPadding,
+                );
+            resizeWindow(
+                logicalWidth * worldUnitsPerPixel,
+                logicalHeight * worldUnitsPerPixel,
+                fontSize * worldUnitsPerPixel * 2.7,
+            );
+            const canvasWidth = Math.round(contentWidth / worldUnitsPerPixel),
+                canvasHeight = Math.round(contentHeight / worldUnitsPerPixel);
+            codeCanvas.width = canvasWidth * codeTextureScale;
+            codeCanvas.height = canvasHeight * codeTextureScale;
+            ctx.setTransform(codeTextureScale, 0, 0, codeTextureScale, 0, 0);
+            ctx.font = fontDeclaration;
             ctx.textBaseline = "alphabetic";
-            resizeWindow((logicalWidth / 1400) * 7.06);
-            ctx.clearRect(0, 0, codeCanvas.width, codeCanvas.height);
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
             ctx.fillStyle = theme.screen;
-            ctx.fillRect(0, 0, codeCanvas.width, codeCanvas.height);
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
             const segments = highlightedSegments(cleanCode, language),
-                lineBaseline = 76 + fontSize * 0.36,
-                lineHeight = fontSize * (57 / 31);
-            const markedSpans = [];
+                markedSpans = [];
             let cleanStart = 0;
             code.split("\n").forEach((rawLine) => {
                 const cleanLine = rawLine.replace(/\[\[(.*?)\]\]/g, "$1");
@@ -1779,19 +1919,19 @@ console.log(hello("[[world]]"));</textarea>
                 ctx.fillStyle = theme.muted;
                 ctx.fillText(
                     String(index + 1).padStart(2, " "),
-                    45,
+                    lineNumberX,
                     lineBaseline + index * lineHeight,
                 );
             });
             const extrusionRequests = [];
             let lineIndex = 0,
-                x = 142;
+                x = codeStartX;
             segments.forEach((segment) => {
                 let partOffset = 0;
                 segment.text.split("\n").forEach((part, index) => {
                     if (index) {
                         lineIndex++;
-                        x = 142;
+                        x = codeStartX;
                         partOffset++;
                     }
                     if (part) {
@@ -1847,7 +1987,8 @@ console.log(hello("[[world]]"));</textarea>
             right: [6, 2.8, 9.4],
             monolith: [0, -4.6, 8.8],
         };
-        let activeCamera = "front";
+        let activeCamera = "front",
+            cameraPresetRequested = true;
         const lightingModes = {
             studio: {
                 sky: "#b8cbff",
@@ -1934,11 +2075,18 @@ console.log(hello("[[world]]"));</textarea>
                 halfFov = THREE.MathUtils.degToRad(camera.fov / 2),
                 frontDistance =
                     Math.max(
-                        4.6 / 2 / Math.tan(halfFov),
+                        (innerHeight + 0.24) / 2 / Math.tan(halfFov),
                         (contentWidth + 0.24) / 2 / (Math.tan(halfFov) * aspect),
-                    ) / 0.84;
-            camera.position.set(x, y, activeCamera === "front" ? frontDistance : z);
-            camera.lookAt(0, 0.05, 0);
+                    ) / 0.84,
+                presetScale = frontDistance / cameraPresets.front[2];
+            zoomLimits.min = Math.max(5, frontDistance * 0.42);
+            zoomLimits.max = Math.max(16, frontDistance * 1.35);
+            controls.minDistance = zoomLimits.min;
+            controls.maxDistance = zoomLimits.max;
+            if (activeCamera === "front") camera.position.set(0, 0.05, frontDistance);
+            else camera.position.set(x * presetScale, y * presetScale, z * presetScale);
+            cameraPresetRequested = false;
+            camera.lookAt(controls.target);
             controls.target.set(0, 0.05, 0);
             controls.update();
             renderGizmo();
@@ -1962,7 +2110,11 @@ console.log(hello("[[world]]"));</textarea>
             draw();
             applyLighting();
             applyBackground();
-            applyCamera();
+            if (cameraPresetRequested) applyCamera();
+            else {
+                renderGizmo();
+                updateZoomIndicator();
+            }
             snapshot();
         }
         let updateTimer;
@@ -2012,6 +2164,7 @@ console.log(hello("[[world]]"));</textarea>
         document.querySelectorAll(".camera-button").forEach((button) =>
             button.addEventListener("click", () => {
                 activeCamera = button.dataset.camera;
+                cameraPresetRequested = true;
                 document.querySelectorAll(".camera-button").forEach((item) => {
                     const isActive = item === button;
                     item.classList.toggle("active", isActive);
@@ -2059,6 +2212,16 @@ console.log(hello("[[world]]"));</textarea>
             a.download = "code-showcase.png";
             a.click();
         });
+        document.querySelectorAll(".cycle-button").forEach((button) =>
+            button.addEventListener("click", () => {
+                const select = document.querySelector(`#${button.dataset.cycleTarget}`),
+                    step = Number(button.dataset.cycleStep),
+                    count = select.options.length;
+                select.selectedIndex = (select.selectedIndex + step + count) % count;
+                select.dispatchEvent(new Event("input", { bubbles: true }));
+                select.dispatchEvent(new Event("change", { bubbles: true }));
+            }),
+        );
         const rustButton = document.querySelector('.language-button[data-language="JavaScript"]');
         rustButton.dataset.language = "Rust";
         rustButton.setAttribute("aria-label", "Rust");
