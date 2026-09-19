@@ -1713,11 +1713,13 @@ console.log(hello("[[world]]"));</textarea>
             contentTop = innerHeight / 2 - titlebarHeight;
         codeCanvas.width = Math.round((contentWidth / worldUnitsPerPixel) * codeTextureScale);
         codeCanvas.height = Math.round((contentHeight / worldUnitsPerPixel) * codeTextureScale);
-        const codeTexture = new THREE.CanvasTexture(codeCanvas);
-        codeTexture.colorSpace = THREE.SRGBColorSpace;
-        codeTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-        codeTexture.repeat.set(1, 1);
-        codeTexture.offset.set(0, 0);
+        const createCodeTexture = () => {
+            const texture = new THREE.CanvasTexture(codeCanvas);
+            texture.colorSpace = THREE.SRGBColorSpace;
+            texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+            return texture;
+        };
+        let codeTexture = createCodeTexture();
         const codeMesh = new THREE.Mesh(
             new THREE.PlaneGeometry(contentWidth, contentHeight),
             new THREE.MeshBasicMaterial({ map: codeTexture, depthWrite: false }),
@@ -2012,14 +2014,26 @@ console.log(hello("[[world]]"));</textarea>
             );
             const canvasWidth = Math.round(contentWidth / worldUnitsPerPixel),
                 canvasHeight = Math.round(contentHeight / worldUnitsPerPixel);
-            codeCanvas.width = canvasWidth * codeTextureScale;
-            codeCanvas.height = canvasHeight * codeTextureScale;
+            const textureWidth = canvasWidth * codeTextureScale,
+                textureHeight = canvasHeight * codeTextureScale,
+                textureResized =
+                    codeCanvas.width !== textureWidth || codeCanvas.height !== textureHeight;
+            if (textureResized) {
+                codeCanvas.width = textureWidth;
+                codeCanvas.height = textureHeight;
+                codeTexture.dispose();
+                codeTexture = createCodeTexture();
+                codeMesh.material.map = codeTexture;
+                codeMesh.material.needsUpdate = true;
+            }
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.globalCompositeOperation = "copy";
+            ctx.fillStyle = theme.screen;
+            ctx.fillRect(0, 0, textureWidth, textureHeight);
             ctx.setTransform(codeTextureScale, 0, 0, codeTextureScale, 0, 0);
+            ctx.globalCompositeOperation = "source-over";
             ctx.font = fontDeclaration;
             ctx.textBaseline = "alphabetic";
-            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-            ctx.fillStyle = theme.screen;
-            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
             const segments = highlightedSegments(cleanCode, language),
                 markedSpans = [];
             let cleanStart = 0;
@@ -2219,6 +2233,7 @@ console.log(hello("[[world]]"));</textarea>
                 camera.updateProjectionMatrix();
                 previewSize = nextSize;
             }
+            renderer.clear(true, true, true);
             renderer.render(scene, camera);
             image.src = renderer.domElement.toDataURL("image/png");
         }
@@ -2265,9 +2280,10 @@ console.log(hello("[[world]]"));</textarea>
             );
         document.querySelector("#reset-font-size").addEventListener("click", () => {
             const size = document.querySelector("#font-size");
+            if (size.value === "31") return;
             size.value = "31";
-            document.querySelector("#font-size-value").value = "31 px";
-            scheduleUpdate();
+            size.dispatchEvent(new Event("input", { bubbles: true }));
+            size.dispatchEvent(new Event("change", { bubbles: true }));
         });
         document
             .querySelector("#font")
