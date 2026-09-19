@@ -8,13 +8,43 @@
         >
         <meta name="description" content="A tiny 3D code snippet showcase.">
         <title>codeShowcase</title>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link
-            href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=IBM+Plex+Mono:wght@400;500&family=JetBrains+Mono:wght@400;500&family=Reddit+Mono:wght@400;500&family=Roboto+Mono:wght@400;500&family=Source+Code+Pro:wght@400;500&display=swap"
-            rel="stylesheet"
-        >
         <style>
+        @font-face {
+            font-family: "Fira Code";
+            src: url("https://cdn.jsdelivr.net/npm/@fontsource/fira-code@5.2.6/files/fira-code-latin-400-normal.woff")
+                format("woff");
+            font-weight: 400;
+        }
+        @font-face {
+            font-family: "Reddit Mono";
+            src: url("https://cdn.jsdelivr.net/npm/@fontsource/reddit-mono@5.2.6/files/reddit-mono-latin-400-normal.woff")
+                format("woff");
+            font-weight: 400;
+        }
+        @font-face {
+            font-family: "JetBrains Mono";
+            src: url("https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5.2.6/files/jetbrains-mono-latin-400-normal.woff")
+                format("woff");
+            font-weight: 400;
+        }
+        @font-face {
+            font-family: "IBM Plex Mono";
+            src: url("https://cdn.jsdelivr.net/npm/@fontsource/ibm-plex-mono@5.2.6/files/ibm-plex-mono-latin-400-normal.woff")
+                format("woff");
+            font-weight: 400;
+        }
+        @font-face {
+            font-family: "Source Code Pro";
+            src: url("https://cdn.jsdelivr.net/npm/@fontsource/source-code-pro@5.2.6/files/source-code-pro-latin-400-normal.woff")
+                format("woff");
+            font-weight: 400;
+        }
+        @font-face {
+            font-family: "Roboto Mono";
+            src: url("https://cdn.jsdelivr.net/npm/@fontsource/roboto-mono@5.2.6/files/roboto-mono-latin-400-normal.woff")
+                format("woff");
+            font-weight: 400;
+        }
         :root {
             color-scheme: dark;
             --ink: #e8eef9;
@@ -90,10 +120,12 @@
         .live-canvas {
             z-index: 1;
             opacity: 0;
+            visibility: hidden;
             pointer-events: none;
         }
         .live-canvas.active {
             opacity: 1;
+            visibility: visible;
             pointer-events: auto;
         }
         #nav-gizmo {
@@ -322,14 +354,16 @@
         }
         .camera-options,
         .lighting-options,
-        .background-options {
+        .background-options,
+        .language-options {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 7px;
         }
         .camera-button,
         .lighting-button,
-        .background-button {
+        .background-button,
+        .language-button {
             display: grid;
             place-items: center;
             aspect-ratio: 1.25;
@@ -342,13 +376,15 @@
         }
         .camera-button:hover,
         .lighting-button:hover,
-        .background-button:hover {
+        .background-button:hover,
+        .language-button:hover {
             color: #fff;
             background: #172238;
         }
         .camera-button.active,
         .lighting-button.active,
-        .background-button.active {
+        .background-button.active,
+        .language-button.active {
             color: #091019;
             background: #8bf0be;
             border-color: #8bf0be;
@@ -356,7 +392,8 @@
         }
         .camera-button svg,
         .lighting-button svg,
-        .background-button svg {
+        .background-button svg,
+        .language-button svg {
             width: 20px;
             height: 20px;
             stroke: currentColor;
@@ -479,31 +516,122 @@
                                     <label for="title">Window title</label>
                                     <input id="title" value="hello.ts" maxlength="28">
                                 </div>
-                                <div class="field split">
-                                    <div>
-                                        <label for="language">Language</label
-                                        ><select id="language">
-                                            <option>TypeScript</option>
-                                            <option>JavaScript</option>
-                                            <option>Python</option>
-                                            <option>CSS</option>
-                                        </select>
+                                <div class="field">
+                                    <label>Language</label>
+                                    <input id="language" type="hidden" value="TypeScript">
+                                    <div
+                                        class="language-options"
+                                        role="group"
+                                        aria-label="Syntax highlighting language"
+                                    >
+                                        <button
+                                            class="language-button active"
+                                            type="button"
+                                            data-language="TypeScript"
+                                            aria-label="TypeScript"
+                                            aria-pressed="true"
+                                            title="TypeScript"
+                                        >
+                                            <svg viewBox="0 0 24 24">
+                                                <rect
+                                                    x="3.5"
+                                                    y="3.5"
+                                                    width="17"
+                                                    height="17"
+                                                    rx="2"
+                                                />
+                                                <path
+                                                    d="M7 9h10M12 9v7M15 12.5c.6.45 1.35.7 2.1.7 1 0 1.65-.42 1.65-1.08 0-.55-.37-.88-1.62-1.16-1.32-.3-1.9-.76-1.9-1.58 0-.93.82-1.54 2-1.54.78 0 1.47.24 1.98.66"
+                                                />
+                                            </svg>
+                                        </button><button
+                                            class="language-button"
+                                            type="button"
+                                            data-language="JavaScript"
+                                            aria-label="JavaScript"
+                                            aria-pressed="false"
+                                            title="JavaScript"
+                                        >
+                                            <svg viewBox="0 0 24 24">
+                                                <rect
+                                                    x="3.5"
+                                                    y="3.5"
+                                                    width="17"
+                                                    height="17"
+                                                    rx="2"
+                                                />
+                                                <path
+                                                    d="M10 8v5.3c0 1.35-.68 2.1-1.95 2.1-.7 0-1.3-.23-1.7-.65M14 14.9c.45.38 1.13.6 1.82.6 1.04 0 1.68-.45 1.68-1.14 0-.57-.38-.9-1.7-1.18-1.25-.28-1.8-.74-1.8-1.55 0-.9.75-1.48 1.87-1.48.77 0 1.42.23 1.88.65"
+                                                />
+                                            </svg>
+                                        </button><button
+                                            class="language-button"
+                                            type="button"
+                                            data-language="Python"
+                                            aria-label="Python"
+                                            aria-pressed="false"
+                                            title="Python"
+                                        >
+                                            <svg viewBox="0 0 24 24">
+                                                <path
+                                                    d="M12 4.5H8.8A2.8 2.8 0 0 0 6 7.3v3.2h6V12H8.2M12 19.5h3.2a2.8 2.8 0 0 0 2.8-2.8v-3.2h-6V12h3.8"
+                                                />
+                                                <circle
+                                                    cx="9"
+                                                    cy="7.6"
+                                                    r=".7"
+                                                    fill="currentColor"
+                                                    stroke="none"
+                                                />
+                                                <circle
+                                                    cx="15"
+                                                    cy="16.4"
+                                                    r=".7"
+                                                    fill="currentColor"
+                                                    stroke="none"
+                                                />
+                                            </svg>
+                                        </button><button
+                                            class="language-button"
+                                            type="button"
+                                            data-language="CSS"
+                                            aria-label="CSS"
+                                            aria-pressed="false"
+                                            title="CSS"
+                                        >
+                                            <svg viewBox="0 0 24 24">
+                                                <path
+                                                    d="m5 4 1.2 16L12 21l5.8-1L19 4zM8.5 8h7M9 12h6M9.5 16h5"
+                                                />
+                                            </svg>
+                                        </button><button
+                                            class="language-button"
+                                            type="button"
+                                            data-language="HTML"
+                                            aria-label="HTML"
+                                            aria-pressed="false"
+                                            title="HTML"
+                                        >
+                                            <svg viewBox="0 0 24 24">
+                                                <path
+                                                    d="m4 12 5-5M4 12l5 5M20 12l-5-5M20 12l-5 5M13.5 5.5l-3 13"
+                                                />
+                                            </svg>
+                                        </button>
                                     </div>
-                                    <div>
-                                        <label for="theme">Theme</label
-                                        ><select id="theme">
-                                            <option value="midnight">Midnight</option>
-                                            <option value="monokai">Monokai</option>
-                                            <option value="darcula">Darcula</option>
-                                            <option value="solarized">Solarized</option>
-                                            <option value="dracula">Dracula</option>
-                                            <option value="nord">Nord</option>
-                                            <option value="contrastLight">
-                                                High Contrast Light
-                                            </option>
-                                            <option value="contrastDark">High Contrast Dark</option>
-                                        </select>
-                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label for="theme">Theme</label
+                                    ><select id="theme">
+                                        <option value="midnight">Midnight</option>
+                                        <option value="monokai">Monokai</option>
+                                        <option value="darcula">Darcula</option>
+                                        <option value="solarized">Solarized</option>
+                                        <option value="dracula">Dracula</option>
+                                        <option value="nord">Nord</option>
+                                        <option value="contrastLight">High Contrast Light</option>
+                                        <option value="contrastDark">High Contrast Dark</option>
+                                    </select>
                                 </div>
                                 <div class="field">
                                     <label for="font">IDE font</label
@@ -915,6 +1043,10 @@ console.log(hello("[[world]]"));</textarea>
                 muted: "#4d5a72",
                 keyword: "#8bf0be",
                 type: "#dba5ff",
+                variable: "#82d7ff",
+                property: "#f3a883",
+                string: "#dba5ff",
+                number: "#ffd166",
             },
             monokai: {
                 bg: "#272822",
@@ -995,7 +1127,7 @@ console.log(hello("[[world]]"));</textarea>
             preserveDrawingBuffer: true,
             alpha: false,
         });
-        renderer.setPixelRatio(Math.min(3, Math.max(2, devicePixelRatio || 1)));
+        renderer.setPixelRatio(Math.min(2, Math.max(1, devicePixelRatio || 1)));
         renderer.outputColorSpace = THREE.SRGBColorSpace;
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -1312,7 +1444,9 @@ console.log(hello("[[world]]"));</textarea>
             contentHeight = 3.92,
             contentTop = 1.74,
             codeCanvas = document.createElement("canvas"),
-            ctx = codeCanvas.getContext("2d");
+            ctx = codeCanvas.getContext("2d"),
+            metricsCanvas = document.createElement("canvas"),
+            metrics = metricsCanvas.getContext("2d");
         codeCanvas.width = 1400;
         codeCanvas.height = 778;
         const codeTexture = new THREE.CanvasTexture(codeCanvas);
@@ -1359,31 +1493,32 @@ console.log(hello("[[world]]"));</textarea>
         group.add(popGroup);
         function disposePops() {
             const geometries = new Set(),
-                materials = new Set();
-            while (popGroup.children.length) {
-                const mesh = popGroup.children.pop();
+                materials = new Set(),
+                meshes = [...popGroup.children];
+            popGroup.clear();
+            meshes.forEach((mesh) => {
                 geometries.add(mesh.geometry);
                 (Array.isArray(mesh.material) ? mesh.material : [mesh.material]).forEach(
                     (material) => materials.add(material),
                 );
-            }
+            });
             geometries.forEach((geometry) => geometry.dispose());
             materials.forEach((material) => material.dispose());
         }
         const outlineFonts = new Map(),
             outlineSources = {
                 "Fira Code":
-                    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/firacode/FiraCode%5Bwght%5D.ttf",
+                    "https://cdn.jsdelivr.net/npm/@fontsource/fira-code@5.2.6/files/fira-code-latin-400-normal.woff",
                 "Reddit Mono":
-                    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/redditmono/RedditMono%5Bwght%5D.ttf",
+                    "https://cdn.jsdelivr.net/npm/@fontsource/reddit-mono@5.2.6/files/reddit-mono-latin-400-normal.woff",
                 "JetBrains Mono":
-                    "https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono@master/fonts/ttf/JetBrainsMono-Regular.ttf",
+                    "https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5.2.6/files/jetbrains-mono-latin-400-normal.woff",
                 "IBM Plex Mono":
-                    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/ibmplexmono/IBMPlexMono-Regular.ttf",
+                    "https://cdn.jsdelivr.net/npm/@fontsource/ibm-plex-mono@5.2.6/files/ibm-plex-mono-latin-400-normal.woff",
                 "Source Code Pro":
-                    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/sourcecodepro/SourceCodePro%5Bwght%5D.ttf",
+                    "https://cdn.jsdelivr.net/npm/@fontsource/source-code-pro@5.2.6/files/source-code-pro-latin-400-normal.woff",
                 "Roboto Mono":
-                    "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/robotomono/RobotoMono%5Bwght%5D.ttf",
+                    "https://cdn.jsdelivr.net/npm/@fontsource/roboto-mono@5.2.6/files/roboto-mono-latin-400-normal.woff",
             };
         async function loadOutlineFont(name) {
             if (outlineFonts.has(name)) return outlineFonts.get(name);
@@ -1396,7 +1531,7 @@ console.log(hello("[[world]]"));</textarea>
                 return null;
             }
         }
-        function outlineShapes(font, text, size) {
+        function outlineData(font, text, size) {
             const path = font.getPath(text, 0, 0, size),
                 shapePath = new THREE.ShapePath();
             path.commands.forEach((command) => {
@@ -1415,17 +1550,14 @@ console.log(hello("[[world]]"));</textarea>
                     shapePath.quadraticCurveTo(command.x1, -command.y1, command.x, -command.y);
                 else if (command.type === "Z") shapePath.currentPath?.closePath();
             });
-            return shapePath.toShapes(true);
+            return { shapes: shapePath.toShapes(false), bounds: path.getBoundingBox() };
         }
-        hljs.registerLanguage("typescript", typescript);
-        hljs.registerLanguage("javascript", javascript);
-        hljs.registerLanguage("python", python);
-        hljs.registerLanguage("css", css);
         const languageNames = {
             TypeScript: "typescript",
-            JavaScript: "javascript",
-            Python: "python",
+            HTML: "xml",
             CSS: "css",
+            Python: "python",
+            Rust: "rust",
         };
         function highlightedSegments(code, language) {
             const template = document.createElement("template");
@@ -1456,41 +1588,51 @@ console.log(hello("[[world]]"));</textarea>
             }));
         }
         function syntaxColor(kind, theme) {
-            if (/keyword|literal|built_in|type|meta/.test(kind)) return theme.keyword;
-            if (/string|attr|property|number|symbol/.test(kind)) return theme.type;
-            if (/title|function|class|variable|params/.test(kind))
-                return new THREE.Color(theme.type)
-                    .lerp(new THREE.Color(theme.text), 0.32)
-                    .getStyle();
             if (/comment/.test(kind)) return theme.muted;
+            if (/title|function|class|variable|params/.test(kind))
+                return theme.variable || theme.type;
+            if (/attr|property/.test(kind)) return theme.property || theme.type;
+            if (/string|symbol/.test(kind)) return theme.string || theme.type;
+            if (/number/.test(kind)) return theme.number || theme.type;
+            if (/keyword|literal|built_in|type|meta/.test(kind)) return theme.keyword;
             return theme.text;
         }
-        function addExtrudedText(text, px, y, color, height, font, fontSize) {
-            const shapes = outlineShapes(font, text, fontSize),
+        function addExtrudedText(text, px, y, color, height, font, fontSize, glyphMetrics) {
+            const { shapes, bounds } = outlineData(font, text, fontSize),
                 geometry = new THREE.ExtrudeGeometry(shapes, {
                     depth: height,
-                    bevelEnabled: true,
-                    bevelSegments: 2,
-                    bevelSize: 0.002,
-                    bevelThickness: 0.002,
-                    curveSegments: 5,
+                    bevelEnabled: false,
+                    curveSegments: 12,
                 }),
-                scale = contentWidth / codeCanvas.width,
-                x = -contentWidth / 2 + (px / codeCanvas.width) * contentWidth,
-                baseline = contentTop - ((y + fontSize * 0.35) / codeCanvas.height) * contentHeight;
-            geometry.scale(scale, scale, 1);
-            geometry.translate(x, baseline, 0.171);
-            const sideColor = new THREE.Color(color).multiplyScalar(0.42),
-                mesh = new THREE.Mesh(geometry, [
-                    new THREE.MeshBasicMaterial({ color }),
-                    new THREE.MeshStandardMaterial({
-                        color: sideColor,
-                        roughness: 0.52,
-                        metalness: 0.08,
-                    }),
-                ]);
+                pixelsToWorldX = contentWidth / codeCanvas.width,
+                pixelsToWorldY = contentHeight / codeCanvas.height,
+                outlineWidth = Math.max(font.getAdvanceWidth(text, fontSize), Number.EPSILON),
+                outlineHeight = Math.max(bounds.y2 - bounds.y1, Number.EPSILON),
+                scaleX = pixelsToWorldX * (glyphMetrics.width / outlineWidth),
+                scaleY =
+                    pixelsToWorldY *
+                    ((glyphMetrics.actualBoundingBoxAscent +
+                        glyphMetrics.actualBoundingBoxDescent) /
+                        outlineHeight),
+                worldX =
+                    -contentWidth / 2 +
+                    (px - glyphMetrics.actualBoundingBoxLeft) * pixelsToWorldX -
+                    bounds.x1 * scaleX,
+                worldY =
+                    contentTop -
+                    (y + glyphMetrics.actualBoundingBoxDescent) * pixelsToWorldY +
+                    bounds.y2 * scaleY,
+                topColor = new THREE.Color().setStyle(color, THREE.SRGBColorSpace);
+            geometry.scale(scaleX, scaleY, 1);
+            geometry.translate(worldX, worldY, codeMesh.position.z + 0.001);
+            const faceColor = topColor.clone().lerp(new THREE.Color(1, 1, 1), 0.1),
+                sideColor = topColor.clone().multiplyScalar(0.4),
+                faceMaterial = new THREE.MeshBasicMaterial({ color: faceColor, toneMapped: false }),
+                sideMaterial = new THREE.MeshBasicMaterial({ color: sideColor, toneMapped: false }),
+                mesh = new THREE.Mesh(geometry, [faceMaterial, sideMaterial]);
             mesh.castShadow = true;
             mesh.receiveShadow = true;
+            mesh.renderOrder = 2;
             popGroup.add(mesh);
         }
         function draw() {
@@ -1507,62 +1649,87 @@ console.log(hello("[[world]]"));</textarea>
             bodyMaterial.color.set(theme.body);
             screenMaterial.color.set(theme.screen);
             barMaterial.color.set(theme.bar);
+            const fontDeclaration = `${fontSize}px ${editorFont}`;
+            metrics.font = fontDeclaration;
+            metrics.textBaseline = "alphabetic";
+            const measure = (text) => metrics.measureText(text);
             ctx.clearRect(0, 0, codeCanvas.width, codeCanvas.height);
             ctx.fillStyle = theme.screen;
             ctx.fillRect(0, 0, codeCanvas.width, codeCanvas.height);
-            ctx.font = `${fontSize}px ${editorFont}`;
-            ctx.textBaseline = "middle";
+            ctx.font = fontDeclaration;
+            ctx.textBaseline = "alphabetic";
             disposePops();
             const cleanCode = code.replace(/\[\[(.*?)\]\]/g, "$1"),
                 segments = highlightedSegments(cleanCode, language),
                 cleanLines = cleanCode.split("\n"),
+                lineBaseline = 76 + fontSize * 0.36,
                 lineHeight = fontSize * (57 / 31);
+            const markedSpans = [];
+            let cleanStart = 0;
+            code.split("\n").forEach((rawLine) => {
+                const cleanLine = rawLine.replace(/\[\[(.*?)\]\]/g, "$1");
+                [...rawLine.matchAll(/\[\[(.*?)\]\]/g)].forEach((match) => {
+                    const before = rawLine.slice(0, match.index).replace(/\[\[(.*?)\]\]/g, "$1");
+                    markedSpans.push({ text: match[1], start: cleanStart + before.length });
+                });
+                cleanStart += cleanLine.length + 1;
+            });
             cleanLines.forEach((_, index) => {
                 ctx.fillStyle = theme.muted;
-                ctx.fillText(String(index + 1).padStart(2, " "), 45, 76 + index * lineHeight);
+                ctx.fillText(
+                    String(index + 1).padStart(2, " "),
+                    45,
+                    lineBaseline + index * lineHeight,
+                );
             });
+            const extrusionRequests = [];
             let lineIndex = 0,
                 x = 142;
             segments.forEach((segment) => {
+                let partOffset = 0;
                 segment.text.split("\n").forEach((part, index) => {
                     if (index) {
                         lineIndex++;
                         x = 142;
+                        partOffset++;
                     }
                     if (part) {
+                        const partStart = segment.start + partOffset;
+                        markedSpans
+                            .filter(
+                                (span) =>
+                                    span.start >= partStart && span.start < partStart + part.length,
+                            )
+                            .forEach((span) =>
+                                extrusionRequests.push({
+                                    text: span.text,
+                                    px: x + measure(part.slice(0, span.start - partStart)).width,
+                                    y: lineBaseline + lineIndex * lineHeight,
+                                    color: syntaxColor(segment.kind, theme),
+                                    glyphMetrics: measure(span.text),
+                                }),
+                            );
                         ctx.fillStyle = syntaxColor(segment.kind, theme);
-                        ctx.fillText(part, x, 76 + lineIndex * lineHeight);
-                        x += ctx.measureText(part).width;
+                        ctx.fillText(part, x, lineBaseline + lineIndex * lineHeight);
+                        x += measure(part).width;
+                        partOffset += part.length;
                     }
                 });
             });
-            if (outlineFont) {
-                let cleanStart = 0;
-                code.split("\n").forEach((rawLine, index) => {
-                    const cleanLine = rawLine.replace(/\[\[(.*?)\]\]/g, "$1");
-                    [...rawLine.matchAll(/\[\[(.*?)\]\]/g)].forEach((match) => {
-                        const before = rawLine
-                                .slice(0, match.index)
-                                .replace(/\[\[(.*?)\]\]/g, "$1"),
-                            px = 142 + ctx.measureText(before).width,
-                            start = cleanStart + before.length,
-                            segment = segments.find(
-                                (item) => start >= item.start && start < item.end,
-                            );
-                        addExtrudedText(
-                            match[1],
-                            px,
-                            76 + index * lineHeight,
-                            syntaxColor(segment?.kind || "plain", theme),
-                            popHeight,
-                            outlineFont,
-                            fontSize,
-                        );
-                    });
-                    cleanStart += cleanLine.length + 1;
-                });
-            }
             codeTexture.needsUpdate = true;
+            if (outlineFont && popHeight > 0)
+                extrusionRequests.forEach(({ text, px, y, color, glyphMetrics }) =>
+                    addExtrudedText(
+                        text,
+                        px,
+                        y,
+                        color,
+                        popHeight,
+                        outlineFont,
+                        fontSize,
+                        glyphMetrics,
+                    ),
+                );
             const t = titleTexture.image.getContext("2d");
             t.clearRect(0, 0, 600, 80);
             t.font = `${Math.round(fontSize * 1.13)}px ${editorFont}`;
@@ -1679,12 +1846,17 @@ console.log(hello("[[world]]"));</textarea>
             camera.lookAt(0, 0.05, 0);
             controls.target.set(0, 0.05, 0);
         }
+        let previewSize = "";
         function snapshot() {
-            const w = preview.clientWidth,
-                h = preview.clientHeight;
-            renderer.setSize(w, h, false);
-            camera.aspect = w / h;
-            camera.updateProjectionMatrix();
+            const w = Math.round(preview.clientWidth),
+                h = Math.round(preview.clientHeight),
+                nextSize = `${w}x${h}`;
+            if (nextSize !== previewSize) {
+                renderer.setSize(w, h, false);
+                camera.aspect = w / h;
+                camera.updateProjectionMatrix();
+                previewSize = nextSize;
+            }
             renderer.render(scene, camera);
             image.src = renderer.domElement.toDataURL("image/png");
         }
@@ -1789,7 +1961,22 @@ console.log(hello("[[world]]"));</textarea>
             a.download = "code-showcase.png";
             a.click();
         });
-        new ResizeObserver(snapshot).observe(preview);
+        const rustButton = document.querySelector('.language-button[data-language="JavaScript"]');
+        rustButton.dataset.language = "Rust";
+        rustButton.setAttribute("aria-label", "Rust");
+        rustButton.setAttribute("title", "Rust");
+        document.querySelectorAll(".language-button").forEach((button) =>
+            button.addEventListener("click", () => {
+                document.querySelector("#language").value = button.dataset.language;
+                document.querySelectorAll(".language-button").forEach((item) => {
+                    const isActive = item === button;
+                    item.classList.toggle("active", isActive);
+                    item.setAttribute("aria-pressed", isActive);
+                });
+                scheduleUpdate();
+            }),
+        );
+        new ResizeObserver(scheduleUpdate).observe(preview);
         Promise.all([
             document.fonts.ready,
             loadOutlineFont(document.querySelector("#font").value),
