@@ -270,6 +270,14 @@
         .accordion-panel .snippet-field {
             min-height: 0;
         }
+        #snippet-line-count {
+            display: block;
+            margin-top: 6px;
+            color: var(--muted);
+            font-size: 11px;
+            font-variant-numeric: tabular-nums;
+            text-align: right;
+        }
         label {
             display: block;
             margin: 0 0 7px;
@@ -845,6 +853,7 @@
 };
 
 console.log(hello("[[world]]"));</textarea>
+                                    <output id="snippet-line-count">5 / 30 lines</output>
                                 </div>
                                 <div class="field">
                                     <div class="range-label">
@@ -1822,6 +1831,12 @@ console.log(hello("[[world]]"));</textarea>
                 topbar.position.z + barDepth + 0.001,
             );
         }
+        function placeBackgroundFloors() {
+            const floorY = -innerHeight / 2 - 0.22;
+            cyberGrid.position.y = floorY;
+            draftingGrid.position.y = floorY;
+            galleryFloor.position.y = floorY - 0.02;
+        }
         const popGroup = new THREE.Group();
         group.add(popGroup);
         function disposePops() {
@@ -2012,6 +2027,7 @@ console.log(hello("[[world]]"));</textarea>
                 logicalHeight * worldUnitsPerPixel,
                 fontSize * worldUnitsPerPixel * 2.7,
             );
+            placeBackgroundFloors();
             const canvasWidth = Math.round(contentWidth / worldUnitsPerPixel),
                 canvasHeight = Math.round(contentHeight / worldUnitsPerPixel);
             const textureWidth = canvasWidth * codeTextureScale,
@@ -2256,6 +2272,22 @@ console.log(hello("[[world]]"));</textarea>
         document
             .querySelectorAll("input, textarea, select")
             .forEach((field) => field.addEventListener("input", scheduleUpdate));
+        const snippetInput = document.querySelector("#code"),
+            snippetLineCount = document.querySelector("#snippet-line-count"),
+            maxSnippetLines = 30;
+        function capSnippetLines() {
+            const lines = snippetInput.value.split("\n"),
+                cappedCode = lines.slice(0, maxSnippetLines).join("\n");
+            if (lines.length > maxSnippetLines) {
+                const selectionStart = Math.min(snippetInput.selectionStart, cappedCode.length),
+                    selectionEnd = Math.min(snippetInput.selectionEnd, cappedCode.length);
+                snippetInput.value = cappedCode;
+                snippetInput.setSelectionRange(selectionStart, selectionEnd);
+            }
+            snippetLineCount.value = `${Math.min(lines.length, maxSnippetLines)} / ${maxSnippetLines} lines`;
+        }
+        snippetInput.addEventListener("input", capSnippetLines);
+        capSnippetLines();
         document
             .querySelector("#pop-height")
             .addEventListener(
