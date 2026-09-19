@@ -160,7 +160,7 @@
         }
         .accordion {
             display: flex;
-            flex: 1;
+            flex: 0 0 auto;
             min-height: 0;
             flex-direction: column;
             gap: 8px;
@@ -176,7 +176,7 @@
             background: rgba(8, 13, 23, 0.35);
         }
         .accordion-section.open {
-            flex: 1 1 auto;
+            flex: 0 0 auto;
         }
         .accordion-trigger {
             display: flex;
@@ -209,18 +209,13 @@
         }
         .accordion-panel {
             display: none;
-            min-height: 0;
             padding: 0 12px 12px;
-            overflow: auto;
         }
         .accordion-section.open .accordion-panel {
-            display: flex;
-            flex: 1;
-            flex-direction: column;
+            display: block;
         }
         .accordion-panel .snippet-field {
-            flex: 1;
-            min-height: 150px;
+            min-height: 0;
         }
         label {
             display: block;
@@ -300,6 +295,7 @@
             box-shadow: 0 0 0 3px rgba(92, 116, 227, 0.15);
         }
         textarea {
+            height: 240px;
             min-height: 0;
             resize: none;
             font:
@@ -316,12 +312,8 @@
         }
         .snippet-field {
             display: flex;
-            flex: 1;
             flex-direction: column;
             min-height: 0;
-        }
-        .snippet-field textarea {
-            flex: 1;
         }
         .split {
             display: grid;
@@ -372,6 +364,41 @@
             stroke-width: 1.7;
             stroke-linecap: round;
             stroke-linejoin: round;
+        }
+        .background-button svg {
+            fill: currentColor;
+            stroke: none;
+        }
+        .language-button svg {
+            display: none;
+        }
+        .language-button::before {
+            width: 20px;
+            height: 20px;
+            content: "";
+            background: currentColor;
+            -webkit-mask: var(--language-icon) center / contain no-repeat;
+            mask: var(--language-icon) center / contain no-repeat;
+        }
+        .language-button[data-language="TypeScript"] {
+            --language-icon: url("https://cdn.jsdelivr.net/npm/simple-icons@15.15.0/icons/typescript.svg");
+            order: 1;
+        }
+        .language-button[data-language="HTML"] {
+            --language-icon: url("https://cdn.jsdelivr.net/npm/simple-icons@15.15.0/icons/html5.svg");
+            order: 2;
+        }
+        .language-button[data-language="CSS"] {
+            --language-icon: url("https://cdn.jsdelivr.net/npm/simple-icons@15.15.0/icons/css.svg");
+            order: 3;
+        }
+        .language-button[data-language="Python"] {
+            --language-icon: url("https://cdn.jsdelivr.net/npm/simple-icons@15.15.0/icons/python.svg");
+            order: 4;
+        }
+        .language-button[data-language="Rust"] {
+            --language-icon: url("https://cdn.jsdelivr.net/npm/simple-icons@15.15.0/icons/rust.svg");
+            order: 5;
         }
         .camera-button.free-view .axis-x {
             stroke: #7181ff;
@@ -536,7 +563,6 @@
                             </button>
                             <div class="accordion-panel">
                                 <div class="field snippet-field">
-                                    <label for="code">Snippet</label>
                                     <p class="hint code-hint">
                                         Wrap text in <code>[[double brackets]]</code> to render it
                                         as a flush 3D layer.
@@ -763,68 +789,91 @@ console.log(hello("[[world]]"));</textarea>
                                         <button
                                             class="background-button active"
                                             type="button"
-                                            data-background="midnight"
-                                            aria-label="Midnight background"
+                                            data-background="studio"
+                                            aria-label="Studio Void background"
                                             aria-pressed="true"
-                                            title="Midnight"
+                                            title="Studio Void"
                                         >
-                                            <svg viewBox="0 0 24 24">
-                                                <path d="M4 18a8 8 0 0 1 12-10 6 6 0 1 0-12 10z" />
+                                            <svg
+                                                class="bi bi-circle-fill"
+                                                viewBox="0 0 16 16"
+                                                aria-hidden="true"
+                                            >
+                                                <circle cx="8" cy="8" r="8" />
+                                            </svg>
+                                        </button>
+                                        <button
+                                            class="background-button"
+                                            type="button"
+                                            data-background="drafting"
+                                            aria-label="Drafting Table background"
+                                            aria-pressed="false"
+                                            title="Drafting Table"
+                                        >
+                                            <svg
+                                                class="bi bi-grid-3x3"
+                                                viewBox="0 0 16 16"
+                                                aria-hidden="true"
+                                            >
                                                 <path
-                                                    d="m17 4 .6 1.4L19 6l-1.4.6L17 8l-.6-1.4L15 6l1.4-.6z"
+                                                    d="M0 1.5A1.5 1.5 0 0 1 1.5 0h13A1.5 1.5 0 0 1 16 1.5v13a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 14.5zM1.5 1a.5.5 0 0 0-.5.5V5h4V1zM5 6H1v4h4zm1 4h4V6H6zm-1 1H1v3.5a.5.5 0 0 0 .5.5H5zm1 0v4h4v-4zm5 0v4h3.5a.5.5 0 0 0 .5-.5V11zm0-1h4V6h-4zm0-5h4V1.5a.5.5 0 0 0-.5-.5H11zm-1 0V1H6v4z"
                                                 />
                                             </svg>
                                         </button>
                                         <button
                                             class="background-button"
                                             type="button"
-                                            data-background="dawn"
-                                            aria-label="Dawn background"
+                                            data-background="aurora"
+                                            aria-label="Aurora background"
                                             aria-pressed="false"
-                                            title="Dawn"
+                                            title="Aurora"
                                         >
-                                            <svg viewBox="0 0 24 24">
+                                            <svg
+                                                class="bi bi-stars"
+                                                viewBox="0 0 16 16"
+                                                aria-hidden="true"
+                                            >
                                                 <path
-                                                    d="M3 17h18M6 14a6 6 0 0 1 12 0M12 3v3M5 7l2 2M19 7l-2 2"
+                                                    d="M7.657 6.247c.11-.33.576-.33.686 0l.645 1.937a2.89 2.89 0 0 0 1.829 1.828l1.936.645c.33.11.33.576 0 .686l-1.937.645a2.89 2.89 0 0 0-1.828 1.829l-.645 1.936a.361.361 0 0 1-.686 0l-.645-1.937a2.89 2.89 0 0 0-1.828-1.828l-1.937-.645a.361.361 0 0 1 0-.686l1.937-.645a2.89 2.89 0 0 0 1.828-1.828zM3.794 1.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387A1.73 1.73 0 0 0 4.593 5.69l-.387 1.162a.217.217 0 0 1-.412 0L3.407 5.69A1.73 1.73 0 0 0 2.31 4.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387A1.73 1.73 0 0 0 3.407 2.31zM10.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.16 1.16 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.16 1.16 0 0 0-.732-.732L9.1 2.137a.145.145 0 0 1 0-.274l.774-.258a1.16 1.16 0 0 0 .732-.732z"
                                                 />
                                             </svg>
                                         </button>
                                         <button
                                             class="background-button"
                                             type="button"
-                                            data-background="paper"
-                                            aria-label="Paper background"
+                                            data-background="cyberdeck"
+                                            aria-label="Cyberdeck background"
                                             aria-pressed="false"
-                                            title="Paper"
+                                            title="Cyberdeck"
                                         >
-                                            <svg viewBox="0 0 24 24">
-                                                <path d="M6 3h9l3 3v15H6zM15 3v4h4" />
-                                                <path d="M9 12h6M9 16h6" />
-                                            </svg>
-                                        </button>
-                                        <button
-                                            class="background-button"
-                                            type="button"
-                                            data-background="forest"
-                                            aria-label="Forest background"
-                                            aria-pressed="false"
-                                            title="Forest"
-                                        >
-                                            <svg viewBox="0 0 24 24">
-                                                <path d="m12 3 7 9h-4l5 7H4l5-7H5z" />
-                                            </svg>
-                                        </button>
-                                        <button
-                                            class="background-button"
-                                            type="button"
-                                            data-background="violet"
-                                            aria-label="Violet background"
-                                            aria-pressed="false"
-                                            title="Violet"
-                                        >
-                                            <svg viewBox="0 0 24 24">
+                                            <svg
+                                                class="bi bi-cpu"
+                                                viewBox="0 0 16 16"
+                                                aria-hidden="true"
+                                            >
                                                 <path
-                                                    d="M12 3c3 4.2 6 6.6 6 10a6 6 0 1 1-12 0c0-3.4 3-5.8 6-10z"
+                                                    d="M5 0a.5.5 0 0 1 .5.5V2h1V.5a.5.5 0 0 1 1 0V2h1V.5a.5.5 0 0 1 1 0V2h1V.5a.5.5 0 0 1 1 0V2A2.5 2.5 0 0 1 14 4.5h1.5a.5.5 0 0 1 0 1H14v1h1.5a.5.5 0 0 1 0 1H14v1h1.5a.5.5 0 0 1 0 1H14v1h1.5a.5.5 0 0 1 0 1H14a2.5 2.5 0 0 1-2.5 2.5v1.5a.5.5 0 0 1-1 0V14h-1v1.5a.5.5 0 0 1-1 0V14h-1v1.5a.5.5 0 0 1-1 0V14h-1v1.5a.5.5 0 0 1-1 0V14A2.5 2.5 0 0 1 2 11.5H.5a.5.5 0 0 1 0-1H2v-1H.5a.5.5 0 0 1 0-1H2v-1H.5a.5.5 0 0 1 0-1H2v-1H.5a.5.5 0 0 1 0-1H2A2.5 2.5 0 0 1 4.5 2V.5A.5.5 0 0 1 5 0m-.5 3A1.5 1.5 0 0 0 3 4.5v7A1.5 1.5 0 0 0 4.5 13h7a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 11.5 3zM5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5zM6.5 6a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5z"
+                                                />
+                                            </svg>
+                                        </button>
+                                        <button
+                                            class="background-button"
+                                            type="button"
+                                            data-background="gallery"
+                                            aria-label="Gallery background"
+                                            aria-pressed="false"
+                                            title="Gallery"
+                                        >
+                                            <svg
+                                                class="bi bi-image"
+                                                viewBox="0 0 16 16"
+                                                aria-hidden="true"
+                                            >
+                                                <path
+                                                    d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"
+                                                />
+                                                <path
+                                                    d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1z"
                                                 />
                                             </svg>
                                         </button>
@@ -1109,6 +1158,64 @@ console.log(hello("[[world]]"));</textarea>
         const rim = new THREE.PointLight("#718bff", 22, 16, 2);
         rim.position.set(5, 2, 2);
         scene.add(rim);
+        const glowCanvas = document.createElement("canvas");
+        glowCanvas.width = glowCanvas.height = 256;
+        const glowContext = glowCanvas.getContext("2d"),
+            glowGradient = glowContext.createRadialGradient(128, 128, 0, 128, 128, 128);
+        glowGradient.addColorStop(0, "rgba(255,255,255,.9)");
+        glowGradient.addColorStop(0.28, "rgba(255,255,255,.34)");
+        glowGradient.addColorStop(1, "rgba(255,255,255,0)");
+        glowContext.fillStyle = glowGradient;
+        glowContext.fillRect(0, 0, 256, 256);
+        const glowTexture = new THREE.CanvasTexture(glowCanvas);
+        const makeGlow = (color, opacity, x, y, scale) => {
+            const glow = new THREE.Sprite(
+                new THREE.SpriteMaterial({
+                    map: glowTexture,
+                    color,
+                    transparent: true,
+                    opacity,
+                    depthWrite: false,
+                }),
+            );
+            glow.position.set(x, y, -3.6);
+            glow.scale.set(scale, scale, 1);
+            glow.visible = false;
+            scene.add(glow);
+            return glow;
+        };
+        const studioGlow = makeGlow("#6f8ccc", 0.24, 0, 0.5, 15),
+            auroraGlows = [
+                makeGlow("#7a5cff", 0.2, -3, 1.2, 11),
+                makeGlow("#33d8d2", 0.16, 3, 0.2, 12),
+                makeGlow("#e56bc7", 0.12, 0, 2.2, 9),
+            ];
+        const softenGrid = (grid, opacity) => {
+            (Array.isArray(grid.material) ? grid.material : [grid.material]).forEach((material) => {
+                material.transparent = true;
+                material.opacity = opacity;
+                material.depthWrite = false;
+            });
+            grid.position.set(0, -2.42, 1.4);
+            grid.visible = false;
+            scene.add(grid);
+            return grid;
+        };
+        const cyberGrid = softenGrid(new THREE.GridHelper(32, 32, "#41d8c1", "#1b5960"), 0.62),
+            draftingGrid = softenGrid(new THREE.GridHelper(28, 28, "#6f8994", "#b7c6c9"), 0.62);
+        const galleryFloor = new THREE.Mesh(
+            new THREE.PlaneGeometry(38, 38),
+            new THREE.MeshBasicMaterial({
+                color: "#d8e0e2",
+                transparent: true,
+                opacity: 0.86,
+                depthWrite: false,
+            }),
+        );
+        galleryFloor.rotation.x = -Math.PI / 2;
+        galleryFloor.position.y = -2.44;
+        galleryFloor.visible = false;
+        scene.add(galleryFloor);
         function roundedShape(w, h, r) {
             const x = -w / 2,
                 y = -h / 2,
@@ -1526,13 +1633,13 @@ console.log(hello("[[world]]"));</textarea>
         };
         let activeLighting = "studio";
         const backgroundModes = {
-            midnight: "#101624",
-            dawn: "#f6c78e",
-            paper: "#eef2f3",
-            forest: "#173c35",
-            violet: "#372059",
+            studio: "#0c1220",
+            drafting: "#dfe8e8",
+            aurora: "#17102b",
+            cyberdeck: "#080d16",
+            gallery: "#eef2f2",
         };
-        let activeBackground = "midnight";
+        let activeBackground = "studio";
         function applyLighting() {
             const mode = lightingModes[activeLighting];
             ambient.color.set(mode.sky);
@@ -1546,6 +1653,11 @@ console.log(hello("[[world]]"));</textarea>
         }
         function applyBackground() {
             scene.background.set(backgroundModes[activeBackground]);
+            studioGlow.visible = activeBackground === "studio";
+            auroraGlows.forEach((glow) => (glow.visible = activeBackground === "aurora"));
+            cyberGrid.visible = activeBackground === "cyberdeck";
+            draftingGrid.visible = activeBackground === "drafting";
+            galleryFloor.visible = activeBackground === "gallery";
         }
         function applyCamera() {
             if (activeCamera === "free") {
