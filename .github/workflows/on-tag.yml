@@ -1,0 +1,55 @@
+name: Publish GitHub Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Read release notes from changelog
+        env:
+          TAG: ${{ github.ref_name }}
+          RELEASE_NOTES: ${{ runner.temp }}/release-notes.md
+        run: |
+          export VERSION="${TAG#v}"
+          python3 - <<'PY'
+          import os
+          import re
+          import sys
+          from pathlib import Path
+
+          contents = Path("CHANGELOG.md").read_text()
+          version = os.environ["VERSION"]
+          match = re.search(
+              rf"(?ms)^## \[(?:v)?{re.escape(version)}\](?:\s+-\s+[^\n]+)?\n(?P<notes>.*?)(?=^## \[|\Z)",
+              contents,
+          )
+          if not match:
+              sys.exit(f"CHANGELOG.md has no section for [{version}].")
+
+          notes = match.group("notes").strip()
+          if not notes:
+              sys.exit(f"CHANGELOG.md section [{version}] has no release notes.")
+
+          Path(os.environ["RELEASE_NOTES"]).write_text(f"{notes}\n")
+          PY
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+          RELEASE_NOTES: ${{ runner.temp }}/release-notes.md
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --title "$TAG" --notes-file "$RELEASE_NOTES"
+          else
+            gh release create "$TAG" --title "$TAG" --notes-file "$RELEASE_NOTES"
+          fi
