@@ -1486,6 +1486,7 @@ console.log(hello("[[world]]"));</textarea>
         controls.target.set(0, 0.05, 0);
         controls.enabled = true;
         controls.addEventListener("change", () => {
+            updateExtrusionProjection();
             snapshot();
             renderGizmo();
             updateZoomIndicator();
@@ -1784,7 +1785,7 @@ console.log(hello("[[world]]"));</textarea>
             topbar.geometry.dispose();
             codeMesh.geometry.dispose();
             body.geometry = new THREE.ExtrudeGeometry(frameShape(width, innerHeight), {
-                depth: 0.035,
+                depth: 0.05,
                 bevelEnabled: true,
                 curveSegments: 48,
                 bevelSegments: 6,
@@ -1839,6 +1840,25 @@ console.log(hello("[[world]]"));</textarea>
         }
         const popGroup = new THREE.Group();
         group.add(popGroup);
+        let activePopHeight = 0;
+        function updateExtrusionProjection() {
+            if (!activePopHeight || !popGroup.children.length) {
+                popGroup.position.set(0, 0, 0);
+                popGroup.scale.set(1, 1, 1);
+                return;
+            }
+            const localCamera = group.worldToLocal(camera.position.clone()),
+                baseZ = codeMesh.position.z,
+                faceZ = baseZ + activePopHeight + 0.001,
+                depth = localCamera.z - baseZ,
+                perspectiveScale = Math.abs(depth) < 0.001 ? 1 : (localCamera.z - faceZ) / depth;
+            popGroup.scale.set(perspectiveScale, perspectiveScale, 1);
+            popGroup.position.set(
+                localCamera.x * (1 - perspectiveScale),
+                localCamera.y * (1 - perspectiveScale),
+                0,
+            );
+        }
         function disposePops() {
             const geometries = new Set(),
                 materials = new Set(),
@@ -1995,6 +2015,7 @@ console.log(hello("[[world]]"));</textarea>
                 popHeight = Number(document.querySelector("#pop-height").value),
                 outlineFont = outlineFonts.get(fontName),
                 editorFont = `"${fontName}", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace`;
+            activePopHeight = popHeight;
             document.documentElement.style.setProperty("--editor-font", `"${fontName}"`);
             bodyMaterial.color.set(theme.body);
             screenMaterial.color.set(theme.screen);
@@ -2262,6 +2283,7 @@ console.log(hello("[[world]]"));</textarea>
                 renderGizmo();
                 updateZoomIndicator();
             }
+            updateExtrusionProjection();
             snapshot();
         }
         let updateTimer;
