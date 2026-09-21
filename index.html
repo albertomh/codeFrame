@@ -1999,8 +1999,8 @@ console.log(hello("[[world]]"));</textarea>
                 topColor = new THREE.Color().setStyle(color, THREE.SRGBColorSpace);
             geometry.scale(scaleX, scaleY, 1);
             geometry.translate(worldX, worldY, codeMesh.position.z + 0.001);
-            const faceColor = topColor.clone().lerp(new THREE.Color(1, 1, 1), 0.1),
-                sideColor = topColor.clone().multiplyScalar(0.4),
+            const faceColor = topColor.clone(),
+                sideColor = topColor.clone().multiplyScalar(0.13),
                 faceMaterial = new THREE.MeshBasicMaterial({ color: faceColor, toneMapped: false }),
                 sideMaterial = new THREE.MeshBasicMaterial({ color: sideColor, toneMapped: false }),
                 mesh = new THREE.Mesh(geometry, [faceMaterial, sideMaterial]);
